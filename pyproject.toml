@@ -1,0 +1,16 @@
+[project]
+name = "gestao-frotas"
+version = "0.1.0"
+description = "Gerenciador de frotas e rotas de entrega"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-mock", "pytest-cov"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
