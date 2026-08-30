@@ -1,4 +1,4 @@
-"""Modelo de viagem: motorista + veículo + rota, com ciclo de vida."""
+Modelo de viagem: motorista + veículo + rota, com ciclo de vida.
 
 
 class StatusViagem:
