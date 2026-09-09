@@ -4,14 +4,13 @@ from gestao_frotas.excecoes import DadoInvalidoException, StatusInvalidoExceptio
 
 class Entrega:
 
-
     # atributos
-    id : int
-    endereco_origem : str
-    endreco_destino : str
-    peso : float
-    prioridade : str #(Baixa, Normal, Alta)?
-    status : str #(Pendente, A Caminho, Entregue?
+    __id : int
+    __endereco_origem : str
+    __endreco_destino : str
+    __peso : float
+    __prioridade : str #(Baixa, Normal, Alta)?
+    __status : str #(Pendente, A Caminho, Entregue?
 
     #Construtor
 
@@ -32,12 +31,12 @@ class Entrega:
             )
 
 
-        self.id = id
-        self.endereco_origem = endereco_origem
-        self.endereco_destino = endereco_destino
-        self.peso = peso
-        self.prioridade = prioridade
-        self.status = status
+        self.__id = id
+        self.__endereco_origem = endereco_origem
+        self.__endereco_destino = endereco_destino
+        self.__peso = peso
+        self.__prioridade = prioridade
+        self.__status = status
 
     # métodos
 
@@ -49,7 +48,7 @@ class Entrega:
             raise DadoInvalidoException(
                 f"Prioridade inválida: {nova_prioridade}. Use: {prioridades_validas}"
             )
-        self.prioridade = nova_prioridade
+        self.__prioridade = nova_prioridade
 
     #alterar status
 
@@ -59,14 +58,38 @@ class Entrega:
             raise StatusInvalidoException(
                 f"Status inválido: {novo_status}. Permitidos: {status_validos}"
             )
-        self.status = novo_status
+        self.__status = novo_status
 
     def __repr__(self) -> str:
         return (
-            f"Entrega(id={self.id}, "
-            f"origem='{self.endereco_origem}', "
-            f"destino='{self.endereco_destino}', "
-            f"peso={self.peso}kg, "
-            f"prioridade='{self.prioridade}', "
-            f"status='{self.status}')"
+            f"Entrega(id={self.__id}, "
+            f"origem='{self.__endereco_origem}', "
+            f"destino='{self.__endereco_destino}', "
+            f"peso={self.__peso}kg, "
+            f"prioridade='{self.__prioridade}', "
+            f"status='{self.__status}')"
         )
+
+    @property
+    def id(self) -> int:
+        return self.__id
+
+    @property
+    def origem(self) -> str:
+        return self.__endereco_origem
+
+    @property
+    def destino(self) -> str:
+        return self.__endereco_destino
+
+    @property
+    def peso(self) -> float:
+        return self.__peso
+
+    @property
+    def prioridade(self) -> str:
+        return self.__prioridade
+
+    @property
+    def status(self) -> str:
+        return self.__status
