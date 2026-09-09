@@ -13,7 +13,6 @@ class Entrega:
     __status : str #(Pendente, A Caminho, Entregue?
 
     #Construtor
-
     def __init__(self, id:int, endereco_origem:str, endereco_destino: str, peso:float, prioridade: str = "Normal", status:str = "Pendente"):
         if peso<=0:
             raise DadoInvalidoException("O Peso tem que ser maior que zero.")

@@ -1,3 +1,6 @@
+from gestao_frotas.excecoes import StatusInvalidoException
+
+
 class Motorista:
     STATUS_DISPONIVEL = "disponível"
     STATUS_EM_VIAGEM = "em viagem"
@@ -9,7 +12,7 @@ class Motorista:
         STATUS_INDISPONIVEL,
     }
 
-    def __init__(self, id, nome, cnh, status=STATUS_DISPONIVEL):
+    def __init__(self, id: int, nome: str, cnh, status=STATUS_DISPONIVEL):
         if status not in self.STATUS_VALIDOS:
             raise ValueError("Status de motorista inválido.")
 
@@ -33,3 +36,9 @@ class Motorista:
     @property
     def status(self):
         return self.__status
+
+    @status.setter
+    def status(self, valor):
+        if valor not in self.STATUS_DISPONIVEL:
+            raise StatusInvalidoException("Status de motorista inválido.")
+        self.__status = valor

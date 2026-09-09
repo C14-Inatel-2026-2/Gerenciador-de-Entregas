@@ -30,7 +30,7 @@ class GerenciadorViagens:
         viagem = Viagem(motorista, veiculo, rota, entregas, horario_inicio, horario_termino)
         self.__viagens_em_andamento.append(viagem)
         viagem.atualizar_status("Em Andamento")
-        #motorista.setStatus("em viagem")
+        motorista.status("em viagem")
 
     def finalizar_viagem(self, viagem: Viagem):
         viagem.atualizar_status("Concluída")
