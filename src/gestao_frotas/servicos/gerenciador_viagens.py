@@ -1,4 +1,4 @@
-from gestao_frotas.excecoes import DadoInvalidoException, CapacidadeExcedidaException, StatusInvalidoException
+from gestao_frotas.excecoes import CapacidadeExcedidaException, StatusInvalidoException
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.veiculo import Veiculo
@@ -21,7 +21,6 @@ class Gerenciador_Viagens:
             raise CapacidadeExcedidaException (
                 f'A peso é superior a capacidade de carga do veículo.'
             )
-            entregar = False
 
         if motorista.status != Motorista.STATUS_DISPONIVEL:
             raise StatusInvalidoException (
@@ -31,5 +30,18 @@ class Gerenciador_Viagens:
         viagem = Viagem(motorista, veiculo, rota, entregas, horario_inicio, horario_termino)
         self.__viagens_em_andamento.append(viagem)
         viagem.atualizar_status("Em Andamento")
+        #motorista.setStatus("em viagem")
+
+    def finalizar_viagem(self, viagem: Viagem):
+        viagem.atualizar_status("Concluída")
+        viagem.motorista.status = Motorista.STATUS_DISPONIVEL
+        self.__viagens_em_andamento.remove(viagem)
+
+    def listar_viagems(self):
+        for viagem in self.__viagens_em_andamento:
+            viagem.__repr__()
+
+
+
 
 
