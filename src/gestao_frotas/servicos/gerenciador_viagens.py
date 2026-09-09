@@ -34,7 +34,7 @@ class GerenciadorViagens:
 
     def finalizar_viagem(self, viagem: Viagem):
         viagem.atualizar_status("Concluída")
-        viagem.motorista.status = Motorista.STATUS_DISPONIVEL
+        viagem.motorista.status("disponível")
         self.__viagens_em_andamento.remove(viagem)
 
     def listar_viagems(self):
