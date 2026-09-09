@@ -13,7 +13,23 @@ class Motorista:
         if status not in self.STATUS_VALIDOS:
             raise ValueError("Status de motorista inválido.")
 
-        self.id = id
-        self.nome = nome
-        self.cnh = cnh
-        self.status = status
+        self.__id = id
+        self.__nome = nome
+        self.__cnh = cnh
+        self.__status = status
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def nome(self):
+        return self.__nome
+
+    @property
+    def cnh(self):
+        return self.__cnh
+
+    @property
+    def status(self):
+        return self.__status
