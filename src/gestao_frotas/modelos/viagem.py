@@ -1,14 +1,16 @@
 from gestao_frotas.excecoes import DadoInvalidoException, StatusInvalidoException
+from gestao_frotas.modelos.entrega import Entrega
+from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.rota import Rota
-
+from gestao_frotas.modelos.veiculo import Veiculo
 
 
 class Viagem:
 
     # Atributos
 
-    motorista: "Motorista" #Aguardando Classe Gabriel
-    veiculo: "Veiculo" #Aguardando Classe Gabriel
+    motorista: Motorista
+    veiculo: Veiculo
     rota: Rota
     entregas: list
     horario_inicio: str
@@ -18,7 +20,7 @@ class Viagem:
     # Construtor
 
     def __init__(
-        self,motorista: object, veiculo: object,rota: object, entregas: list = None,horario_inicio: str = None, horario_termino: str = None, status: str = "Pendente"):
+        self,motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega] ,horario_inicio: str = None, horario_termino: str = None, status: str = "Pendente"):
 
         status_validos = ["Pendente", "Em Andamento", "Concluida"]
         if status not in status_validos:
@@ -52,3 +54,31 @@ class Viagem:
             f"entregas={len(self.entregas)}, "
             f"status='{self.status}')"
         )
+
+    @property
+    def motorista(self) -> Motorista:
+        return self.__motorista
+
+    @property
+    def veiculo(self) -> Veiculo:
+        return self.__veiculo
+
+    @property
+    def rota(self) -> Rota:
+        return self.__rota
+
+    @property
+    def entregas(self) -> list[Entrega]:
+        return self.__entregas
+
+    @property
+    def horario_inicio(self):
+        return self.__horario_inicio
+
+    @property
+    def horario_termino(self):
+        return self.__horario_termino
+
+    @property
+    def status(self) -> str:
+        return self.__status

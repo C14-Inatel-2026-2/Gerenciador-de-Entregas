@@ -6,7 +6,7 @@ from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.viagem import Viagem
 from datetime import datetime
 
-class Gerenciador_Viagens:
+class GerenciadorViagens:
 
     def __init__(self):
         self.__viagens_em_andamento: list[Viagem] = []
