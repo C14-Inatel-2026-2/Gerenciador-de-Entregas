@@ -9,6 +9,8 @@ class Motorista:
         STATUS_INDISPONIVEL,
     }
 
+    TIPOS_VEICULO_VALIDOS = {"carro", "caminhão"}
+
     def __init__(self, id, nome, cnh, status=STATUS_DISPONIVEL):
         if status not in self.STATUS_VALIDOS:
             raise ValueError("Status de motorista inválido.")
@@ -17,3 +19,9 @@ class Motorista:
         self.nome = nome
         self.cnh = cnh
         self.status = status
+
+    def atualizar_status(self, novo_status):
+        if novo_status not in self.STATUS_VALIDOS:
+            raise ValueError("Status de motorista inválido.")
+
+        self.status = novo_status
