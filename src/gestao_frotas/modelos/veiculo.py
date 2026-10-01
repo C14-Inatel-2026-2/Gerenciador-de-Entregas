@@ -38,3 +38,7 @@ class Veiculo:
     @property
     def custo_por_km(self):
         return self.__custo_por_km
+
+    def pode_transportar(self, peso) -> bool:
+        """Indica se o veículo comporta o peso informado (em kg)."""
+        return peso <= self.__capacidade_de_carga
