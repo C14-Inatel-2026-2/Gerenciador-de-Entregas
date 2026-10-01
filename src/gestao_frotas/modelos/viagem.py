@@ -11,7 +11,6 @@ class StatusViagem(Enum):
     CONCLUIDO = 3
 
 class Viagem:
-
     # Atributos
     __motorista: Motorista
     __veiculo: Veiculo
@@ -38,6 +37,9 @@ class Viagem:
 
     def atualizar_status(self, status: StatusViagem):
         self.__status = status
+
+    def get_status(self):
+        return self.__status
 
 
     def __repr__(self) -> str:
@@ -73,6 +75,3 @@ class Viagem:
     def horario_termino(self):
         return self.__horario_termino
 
-    @property
-    def status(self) -> str:
-        return self.__status

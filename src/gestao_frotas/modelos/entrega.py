@@ -6,7 +6,7 @@ from gestao_frotas.excecoes import DadoInvalidoException
 class StatusEntrega(Enum):
     PENDENTE = 1
     A_CAMINHO = 2
-    ENTREGA = 3
+    ENTREGUE = 3
 
 class Prioridade(Enum):
     BAIXA = 1
@@ -43,6 +43,11 @@ class Entrega:
     def atualizar_prioridade(self, prioridade: Prioridade) -> None:
         self.__prioridade = prioridade
 
+    def get_status(self):
+        return self.__status
+
+    def get_prioridade(self):
+        return self.__prioridade
 
     def __repr__(self) -> str:
         return (
@@ -70,11 +75,3 @@ class Entrega:
     def peso(self) -> float:
         return self.__peso
 
-    @property
-    def prioridade(self) -> str:
-        return self.__prioridade
-
-    # TODO: VERIFICAR COM WILLIAM, A NECESSIDADE DE TER ESSE PROPERTY, DADO QUE JÁ TEMOS UM MÉTODO QUE ATUALIZA O STATUS
-    @property
-    def status(self) -> str:
-        return self.__status
