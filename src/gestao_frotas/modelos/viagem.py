@@ -1,50 +1,44 @@
-from gestao_frotas.excecoes import DadoInvalidoException, StatusInvalidoException
+from enum import Enum
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.veiculo import Veiculo
 
 
+class StatusViagem(Enum):
+    PENDENTE = 1
+    EM_ANDAMENTO = 2
+    CONCLUIDO = 3
+
 class Viagem:
 
     # Atributos
-
-    motorista: Motorista
-    veiculo: Veiculo
-    rota: Rota
-    entregas: list
-    horario_inicio: str
-    horario_termino: str
-    status: str  #(Pendente, A Caminho, Entregue?
+    __motorista: Motorista
+    __veiculo: Veiculo
+    __rota: Rota
+    __entregas: list
+    __horario_inicio: str
+    __horario_termino: str
+    __status: StatusViagem
 
     # Construtor
 
     def __init__(
-        self,motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega] ,horario_inicio: str = None, horario_termino: str = None, status: str = "Pendente"):
+        self, motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega] ,horario_inicio: str = None, horario_termino: str = None, status: StatusViagem = StatusViagem.PENDENTE):
 
-        status_validos = ["Pendente", "Em Andamento", "Concluida"]
-        if status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inicial inválido: {status}. Use: {status_validos}"
-            )
-
-        self.motorista = motorista
-        self.veiculo = veiculo
-        self.rota = rota
-        self.entregas = entregas if entregas is not None else []
-        self.horario_inicio = horario_inicio
-        self.horario_termino = horario_termino
-        self.status = status
+        self.__motorista = motorista
+        self.__veiculo = veiculo
+        self.__rota = rota
+        self.__entregas = entregas if entregas is not None else []
+        self.__horario_inicio = horario_inicio
+        self.__horario_termino = horario_termino
+        self.__status = status
 
     # Métodos
 
-    def atualizar_status(self, novo_status: str) -> None:
-        status_validos = ["Pendente", "Em Andamento", "Concluida"]
-        if novo_status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inválido: {novo_status}. Permitidos: {status_validos}"
-            )
-        self.status = novo_status
+    def atualizar_status(self, status: StatusViagem):
+        self.__status = status
+
 
     def __repr__(self) -> str:
         return (
