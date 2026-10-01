@@ -25,3 +25,11 @@ class Motorista:
             raise ValueError("Status de motorista inválido.")
 
         self.status = novo_status
+
+    def atribuir_veiculo(self, veiculo):
+        tipos_permitidos = self.cnh.get(next(iter(self.cnh)), [])
+
+        if veiculo.tipo not in tipos_permitidos:
+            raise ValueError("Motorista não pode dirigir este veículo.")
+
+        self.veiculo = veiculo
