@@ -36,6 +36,8 @@ class Viagem:
     # Métodos
 
     def atualizar_status(self, status: StatusViagem):
+        if not isinstance(status, StatusViagem):
+            raise ValueError("Status inválido. Deve ser um valor do Enum StatusViagem.")
         self.__status = status
 
     def get_status(self):
@@ -48,7 +50,7 @@ class Viagem:
             f"veiculo={self.veiculo}, "
             f"rota={self.rota}, "
             f"entregas={len(self.entregas)}, "
-            f"status='{self.status}')"
+            f"status='{self.__status}')"
         )
 
     @property
