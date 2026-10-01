@@ -39,6 +39,6 @@ class Motorista:
 
     @status.setter
     def status(self, valor):
-        if valor not in self.STATUS_DISPONIVEL:
+        if valor not in self.STATUS_VALIDOS:
             raise StatusInvalidoException("Status de motorista inválido.")
         self.__status = valor

@@ -28,13 +28,13 @@ class Viagem:
                 f"Status inicial inválido: {status}. Use: {status_validos}"
             )
 
-        self.motorista = motorista
-        self.veiculo = veiculo
-        self.rota = rota
-        self.entregas = entregas if entregas is not None else []
-        self.horario_inicio = horario_inicio
-        self.horario_termino = horario_termino
-        self.status = status
+        self.__motorista = motorista
+        self.__veiculo = veiculo
+        self.__rota = rota
+        self.__entregas = entregas if entregas is not None else []
+        self.__horario_inicio = horario_inicio
+        self.__horario_termino = horario_termino
+        self.__status = status
 
     # Métodos
 
@@ -44,7 +44,7 @@ class Viagem:
             raise StatusInvalidoException(
                 f"Status inválido: {novo_status}. Permitidos: {status_validos}"
             )
-        self.status = novo_status
+        self.__status = novo_status
 
     def __repr__(self) -> str:
         return (
