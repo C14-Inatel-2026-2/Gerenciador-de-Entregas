@@ -6,7 +6,8 @@ class Veiculo:
         modelo,
         capacidade_de_carga,
         consumo_medio,
-        custo_por_km
+        custo_por_km,
+        tipo
     ):
         self.__id = id
         self.__placa = placa
@@ -14,6 +15,7 @@ class Veiculo:
         self.__capacidade_de_carga = capacidade_de_carga
         self.__consumo_medio = consumo_medio
         self.__custo_por_km = custo_por_km
+        self.__tipo = tipo
 
     @property
     def id(self):

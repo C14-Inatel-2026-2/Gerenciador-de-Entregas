@@ -12,33 +12,27 @@ class Motorista:
         STATUS_INDISPONIVEL,
     }
 
-    def __init__(self, id: int, nome: str, cnh, status=STATUS_DISPONIVEL):
+    TIPOS_VEICULO_VALIDOS = {"carro", "caminhão"}
+
+    def __init__(self, id, nome, cnh, status=STATUS_DISPONIVEL):
         if status not in self.STATUS_VALIDOS:
             raise ValueError("Status de motorista inválido.")
 
-        self.__id = id
-        self.__nome = nome
-        self.__cnh = cnh
-        self.__status = status
+        self.id = id
+        self.nome = nome
+        self.cnh = cnh
+        self.status = status
 
-    @property
-    def id(self):
-        return self.__id
+    def atualizar_status(self, novo_status):
+        if novo_status not in self.STATUS_VALIDOS:
+            raise ValueError("Status de motorista inválido.")
 
-    @property
-    def nome(self):
-        return self.__nome
+        self.status = novo_status
 
-    @property
-    def cnh(self):
-        return self.__cnh
+    def atribuir_veiculo(self, veiculo):
+        tipos_permitidos = self.cnh.get(next(iter(self.cnh)), [])
 
-    @property
-    def status(self):
-        return self.__status
+        if veiculo.tipo not in tipos_permitidos:
+            raise ValueError("Motorista não pode dirigir este veículo.")
 
-    @status.setter
-    def status(self, valor):
-        if valor not in self.STATUS_DISPONIVEL:
-            raise StatusInvalidoException("Status de motorista inválido.")
-        self.__status = valor
+        self.veiculo = veiculo
