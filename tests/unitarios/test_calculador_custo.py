@@ -14,6 +14,7 @@ def criar_veiculo(consumo_medio=10.0, custo_por_km=1.5):
         capacidade_de_carga=1000,
         consumo_medio=consumo_medio,
         custo_por_km=custo_por_km,
+        tipo="carro"
     )
 
 
