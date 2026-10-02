@@ -13,7 +13,7 @@ class TestViagem:
     @pytest.fixture
     def viagem(self) -> Viagem:
        motorista: Motorista = Motorista(0,"Victor","A")
-       veiculo: Veiculo = Veiculo(0,"abc1234","Carreta", 100, 50,10)
+       veiculo: Veiculo = Veiculo(0,"abc1234","Carreta", 100, 50,10, "carro")
        rota: Rota = Rota("Santa Rita", "Pouso Alegre", 20, 0.5)
        entregas: list[Entrega] = [Entrega(0, "Pouso Alegre", "Santa Rita",10.5,Prioridade.NORMAL, StatusEntrega.PENDENTE ),
                                   Entrega(1, "Pouso Alegre", "Santa Rita",20,Prioridade.ALTA, StatusEntrega.PENDENTE )    ]
