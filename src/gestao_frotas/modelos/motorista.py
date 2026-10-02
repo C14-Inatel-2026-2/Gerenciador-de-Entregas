@@ -1,3 +1,6 @@
+from gestao_frotas.excecoes import StatusInvalidoException
+
+
 class Motorista:
     STATUS_DISPONIVEL = "disponível"
     STATUS_EM_VIAGEM = "em viagem"
