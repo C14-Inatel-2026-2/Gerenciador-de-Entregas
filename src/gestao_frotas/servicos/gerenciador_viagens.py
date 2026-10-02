@@ -1,10 +1,11 @@
-from gestao_frotas.excecoes import CapacidadeExcedidaException, StatusInvalidoException
+from gestao_frotas.excecoes import CapacidadeExcedidaException, DadoInvalidoException
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.veiculo import Veiculo
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.viagem import Viagem,StatusViagem
-from datetime import datetime
+from datetime import datetime, timedelta
+from gestao_frotas.servicos.calculador_custo import CalculadorCusto
 
 
 class GerenciadorViagens:
@@ -14,7 +15,7 @@ class GerenciadorViagens:
 
     def iniciar_viagem(self, motorista: Motorista, rota: Rota, veiculo: Veiculo, entregas: list[Entrega]):
         horario_inicio = datetime.now()
-        horario_termino = None
+        horario_termino = horario_inicio + timedelta(hours=rota.tempo_estimado_horas)
 
         peso_total = sum(entrega.peso for entrega in entregas)
 
@@ -24,11 +25,24 @@ class GerenciadorViagens:
             )
 
         if motorista.status != Motorista.STATUS_DISPONIVEL:
-            raise StatusInvalidoException (
+            raise DadoInvalidoException (
                 f'O motorista {motorista.nome} não está disponível para entrega.'
             )
 
+        try:
+            motorista.atribuir_veiculo(veiculo)
+        except ValueError:
+            raise DadoInvalidoException (
+                f'O veículo não pode ser atribuído a esse motorista.'
+            )
+
+        calculador = CalculadorCusto(None)
+        custo_total = calculador.calcular_custo_combustivel(rota, veiculo, '')
+        custo_total +=  calculador.custo_por_distancia(rota, veiculo)
+
         viagem = Viagem(motorista, veiculo, rota, entregas, horario_inicio, horario_termino)
+        viagem.addCustoTotal(custo_total)
+
         self.__viagens_em_andamento.append(viagem)
         viagem.atualizar_status(StatusViagem.EM_ANDAMENTO)
         motorista.status("em viagem")

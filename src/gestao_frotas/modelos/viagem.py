@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
@@ -16,14 +17,17 @@ class Viagem:
     __veiculo: Veiculo
     __rota: Rota
     __entregas: list
-    __horario_inicio: str
-    __horario_termino: str
+    __horario_inicio: datetime.datetime
+    __horario_termino: datetime.datetime
     __status: StatusViagem
+    __custo_total: float
 
     # Construtor
 
     def __init__(
-        self, motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega] ,horario_inicio: str = None, horario_termino: str = None, status: StatusViagem = StatusViagem.PENDENTE):
+        self, motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega],
+            horario_inicio: datetime.datetime = None, horario_termino: datetime.datetime = None,
+            status: StatusViagem = StatusViagem.PENDENTE):
 
         self.__motorista = motorista
         self.__veiculo = veiculo
@@ -43,6 +47,8 @@ class Viagem:
     def get_status(self):
         return self.__status
 
+    def addCustoTotal(self, custo_total: float):
+        self.__custo_total = custo_total
 
     def __repr__(self) -> str:
         return (
