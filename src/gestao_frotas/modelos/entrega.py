@@ -1,34 +1,32 @@
+from enum import Enum
+from gestao_frotas.excecoes import DadoInvalidoException
 
-from gestao_frotas.excecoes import DadoInvalidoException, StatusInvalidoException
 
+
+class StatusEntrega(Enum):
+    PENDENTE = 1
+    A_CAMINHO = 2
+    ENTREGUE = 3
+
+class Prioridade(Enum):
+    BAIXA = 1
+    NORMAL = 2
+    ALTA = 3
 
 class Entrega:
 
     # atributos
     __id : int
     __endereco_origem : str
-    __endreco_destino : str
+    __endereco_destino : str
     __peso : float
-    __prioridade : str #(Baixa, Normal, Alta)?
-    __status : str #(Pendente, A Caminho, Entregue?
+    __prioridade : Prioridade
+    __status : StatusEntrega
 
     #Construtor
-    def __init__(self, id:int, endereco_origem:str, endereco_destino: str, peso:float, prioridade: str = "Normal", status:str = "Pendente"):
+    def __init__(self, id:int, endereco_origem:str, endereco_destino: str, peso:float, prioridade: Prioridade = Prioridade.NORMAL, status: StatusEntrega = StatusEntrega.PENDENTE) -> None:
         if peso<=0:
             raise DadoInvalidoException("O Peso tem que ser maior que zero.")
-
-        prioridades_validas = ["Baixa", "Normal", "Alta"]
-        if prioridade not in prioridades_validas:
-            raise DadoInvalidoException(
-                f"Prioridade inválida: {prioridade}. Use: {prioridades_validas}"
-            )
-
-        status_validos = ["Pendente", "A Caminho", "Entregue"]
-        if status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inicial inválido: {status}. Use: {status_validos}"
-            )
-
 
         self.__id = id
         self.__endereco_origem = endereco_origem
@@ -39,25 +37,17 @@ class Entrega:
 
     # métodos
 
-    # alterar prioridade
+    def atualizar_status(self, status: StatusEntrega) -> None:
+        self.__status = status
 
-    def alterar_prioridade(self, nova_prioridade: str) -> None:
-        prioridades_validas = ["Baixa", "Normal", "Alta"]
-        if nova_prioridade not in prioridades_validas:
-            raise DadoInvalidoException(
-                f"Prioridade inválida: {nova_prioridade}. Use: {prioridades_validas}"
-            )
-        self.__prioridade = nova_prioridade
+    def atualizar_prioridade(self, prioridade: Prioridade) -> None:
+        self.__prioridade = prioridade
 
-    #alterar status
+    def get_status(self):
+        return self.__status
 
-    def atualizar_status(self, novo_status: str) -> None:
-        status_validos = ["Pendente", "A Caminho", "Entregue"]
-        if novo_status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inválido: {novo_status}. Permitidos: {status_validos}"
-            )
-        self.__status = novo_status
+    def get_prioridade(self):
+        return self.__prioridade
 
     def __repr__(self) -> str:
         return (
@@ -85,10 +75,3 @@ class Entrega:
     def peso(self) -> float:
         return self.__peso
 
-    @property
-    def prioridade(self) -> str:
-        return self.__prioridade
-
-    @property
-    def status(self) -> str:
-        return self.__status

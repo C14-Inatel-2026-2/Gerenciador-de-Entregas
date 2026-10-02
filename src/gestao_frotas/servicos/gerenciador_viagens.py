@@ -3,8 +3,9 @@ from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.veiculo import Veiculo
 from gestao_frotas.modelos.rota import Rota
-from gestao_frotas.modelos.viagem import Viagem
+from gestao_frotas.modelos.viagem import Viagem,StatusViagem
 from datetime import datetime
+
 
 class GerenciadorViagens:
 
@@ -29,11 +30,11 @@ class GerenciadorViagens:
 
         viagem = Viagem(motorista, veiculo, rota, entregas, horario_inicio, horario_termino)
         self.__viagens_em_andamento.append(viagem)
-        viagem.atualizar_status("Em Andamento")
+        viagem.atualizar_status(StatusViagem.EM_ANDAMENTO)
         motorista.status("em viagem")
 
     def finalizar_viagem(self, viagem: Viagem):
-        viagem.atualizar_status("Concluída")
+        viagem.atualizar_status(StatusViagem.CONCLUIDO)
         viagem.motorista.status("disponível")
         self.__viagens_em_andamento.remove(viagem)
 
