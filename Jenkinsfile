@@ -19,10 +19,19 @@ pipeline {
             }
         }
         stage('Testes') {
-            steps {
-                echo 'TODO: stage do integrante dos testes'
-            }
+    steps {
+        sh '''
+            . .venv/bin/activate
+            pytest --junitxml=relatorio-testes.xml --cov=gestao_frotas --cov-report=html --cov-report=xml
+        '''
+    }
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'relatorio-testes.xml'
+            archiveArtifacts artifacts: 'htmlcov/**,coverage.xml', allowEmptyArchive: true
         }
+    }
+}
         stage('Deploy') {
             steps {
                 echo 'TODO: stage do integrante do deploy'
