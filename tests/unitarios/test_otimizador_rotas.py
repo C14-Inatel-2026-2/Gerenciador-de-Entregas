@@ -3,7 +3,7 @@
 import pytest
 
 
-def test_placeholder(mapas_falso):
+def test_placeholder():
     # TODO: instanciar OtimizadorRotas(mapas_falso) e verificar a ordem da rota
     # TODO: garantir que nenhuma chamada de rede acontece
     pytest.skip("ainda não implementado")
