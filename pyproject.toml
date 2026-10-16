@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-mock", "pytest-cov", "datetime"]
+dev = ["pytest", "pytest-mock", "pytest-cov", "freezegun"]
 
 [build-system]
 requires = ["setuptools"]
