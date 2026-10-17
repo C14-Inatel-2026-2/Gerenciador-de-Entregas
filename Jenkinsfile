@@ -15,7 +15,23 @@ pipeline {
         }
         stage('Lint') {
             steps {
-                echo 'TODO: stage do integrante do lint'
+                sh '''
+                    . .venv/bin/activate
+                    flake8 . --format=pylint > flake8.log || true
+                '''
+            }
+            post {
+                always {
+                    recordIssues (
+                        tools: [flake8(pattern: 'flake8.log')],
+                        qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                    )
+                }
+                unsuccessful {
+                    mail to: 'williamandrade003@gmail.com',
+                         subject: "Lint com problemas: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "O lint encontrou problemas.\n\nVeja os detalhes: ${env.BUILD_URL}"
+                    }
             }
         }
         stage('Testes') {
@@ -23,12 +39,14 @@ pipeline {
                 echo 'TODO: stage do integrante dos testes'
             }
         }
- stage('Deploy') {
-    when { branch 'main' }
-    steps {
-        echo 'Disparando deploy no Render...'
-        withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
-            sh 'curl -fsS -X POST "$RENDER_HOOK"'
+        stage('Deploy') {
+            when { branch 'main' }
+            steps {
+                echo 'Disparando deploy no Render...'
+                withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
+                    sh 'curl -fsS -X POST "$RENDER_HOOK"'
+                }
+            }
         }
     }
 }
