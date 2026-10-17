@@ -7,5 +7,5 @@ app = Flask(__name__)
 def home():
     return {"status": "Gerenciador de Entregas rodando com sucesso!"}
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
