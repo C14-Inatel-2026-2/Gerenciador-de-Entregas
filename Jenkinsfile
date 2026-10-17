@@ -23,9 +23,14 @@ pipeline {
             post {
                 always {
                     recordIssues (
-                        tools: [flake8(pattern: 'flake8.log')]
+                        tools: [flake8(pattern: 'flake8.log')],
                         qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
                     )
+                }
+                unsuccessful {
+                mail to: 'williamandrade003@gmail.com',
+                     subject: "Lint com problemas: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "O lint encontrou problemas.\n\nVeja os detalhes: ${env.BUILD_URL}"
                 }
             }
         }
@@ -34,12 +39,14 @@ pipeline {
                 echo 'TODO: stage do integrante dos testes'
             }
         }
- stage('Deploy') {
-    when { branch 'main' }
-    steps {
-        echo 'Disparando deploy no Render...'
-        withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
-            sh 'curl -fsS -X POST "$RENDER_HOOK"'
+        stage('Deploy') {
+            when { branch 'main' }
+            steps {
+                echo 'Disparando deploy no Render...'
+                withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
+                    sh 'curl -fsS -X POST "$RENDER_HOOK"'
+                }
+            }
         }
     }
 }
