@@ -23,10 +23,12 @@ pipeline {
                 echo 'TODO: stage do integrante dos testes'
             }
         }
-        stage('Deploy') {
-            steps {
-                echo 'TODO: stage do integrante do deploy'
-            }
+ stage('Deploy') {
+    when { branch 'main' }
+    steps {
+        echo 'Disparando deploy no Render...'
+        withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
+            sh 'curl -fsS -X POST "$RENDER_HOOK"'
         }
     }
 }
