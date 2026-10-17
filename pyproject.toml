@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = ["flask","gunicorn"]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-mock", "pytest-cov", "freezegun"]
+dev = ["pytest", "pytest-mock", "pytest-cov", "freezegun", "flake8"]
 
 [build-system]
 requires = ["setuptools"]
