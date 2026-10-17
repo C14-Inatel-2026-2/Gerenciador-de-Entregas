@@ -15,7 +15,18 @@ pipeline {
         }
         stage('Lint') {
             steps {
-                echo 'TODO: stage do integrante do lint'
+                sh '''
+                    . .venv/bin/activate
+                    flake8 . --format=pylint > flake8.log || true
+                '''
+            }
+            post {
+                always {
+                    recordIssues (
+                        tools: [flake8(pattern: 'flake8.log')]
+                        qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                    )
+                }
             }
         }
         stage('Testes') {
