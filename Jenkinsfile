@@ -28,10 +28,10 @@ pipeline {
                     )
                 }
                 unsuccessful {
-                mail to: 'williamandrade003@gmail.com',
-                     subject: "Lint com problemas: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "O lint encontrou problemas.\n\nVeja os detalhes: ${env.BUILD_URL}"
-                }
+                    mail to: 'williamandrade003@gmail.com',
+                         subject: "Lint com problemas: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                         body: "O lint encontrou problemas.\n\nVeja os detalhes: ${env.BUILD_URL}"
+                    }
             }
         }
         stage('Testes') {
