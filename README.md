@@ -1,4 +1,10 @@
-## Uso de Inteligência Artificial no Projeto
+## 1) O Users Storys no Jira
+As User Stories do projeto foram estruturadas individualmente como cards no Jira. 
+Ao abrir qualquer item do quadro, a seção de detalhes apresenta a descrição completa da funcionalidade, acompanhada de seus respectivos requisitos e critérios de aceitação. 
+
+O acompanhamento pode ser feito pelo link: https://s03-gerenciador.atlassian.net/jira/software/projects/SCRUM/pages.
+
+## 2) Uso de Inteligência Artificial no Projeto
 
 ### Uso de IA (Gemini) — Job de Lint no Jenkinsfile (Willian)
 Estes são os registros do uso do Google Gemini para a configuração da etapa de análise estática de código (Lint) no pipeline:
