@@ -70,3 +70,13 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Acompanhamento da Situação dos Motoristas:** O sistema deve permitir listar e visualizar a situação atual dos motoristas.
 - **Algoritmo de Otimização de Rotas:** O sistema deve contar com um algoritmo capaz de calcular a rota ideal para maximizar a eficiência de tempo e combustível.
 - **Visualização do Mapa:** O sistema deve exibir visualmente em um mapa interativo a rota otimizada gerada para o trajeto dos motoristas.
+
+### Requisitos Não Funcionais
+
+- **Testabilidade**: o sistema usa injeção de dependência nos serviços, o que permite testar as regras de negócio com mocks no lugar dos provedores externos. Os testes não dependem de rede nem de serviços de terceiros.
+- **Qualidade de código**: o projeto segue um padrão de estilo verificado por análise estática (flake8), e a pipeline avisa por email quando o lint encontra problemas.
+- **(CI/CD):** o projeto tem uma pipeline no Jenkins com os estágios de build, testes (com relatório de cobertura) e deploy, rodando a cada alteração no repositório.
+- **Portabilidade**: a aplicação roda em Python 3.11 ou superior e é empacotada com Docker, o que permite subir em qualquer ambiente sem configuração manual.
+- **Manutenibilidade**: o código é organizado em camadas (modelos, serviços, interfaces e repositórios), separando os dados das regras de negócio, o que facilita a manutenção e a evolução.
+- **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
+- **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
