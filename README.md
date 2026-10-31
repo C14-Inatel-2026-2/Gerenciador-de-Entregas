@@ -1,10 +1,17 @@
-## 1) O Users Storys no Jira
+## 1) Descrição do Projeto
+O Gerenciador de Entregas é um sistema desenvolvido em Python com o objetivo de facilitar a organização e o controle das entregas.
+
+A ideia do projeto é reunir em um só lugar as informações dos motoristas, veículos e entregas, facilitando o acompanhamento dos cadastros, a disponibilidade dos motoristas e a situação de cada entrega.
+
+Além disso, o sistema busca ajudar no planejamento das rotas, considerando fatores como a distância, a capacidade de carga dos veículos e os custos de transporte. Dessa forma, o projeto tem como objetivo tornar o gerenciamento das entregas mais simples, organizado e eficiente.
+
+## 2) O Users Storys no Jira
 As User Stories do projeto foram estruturadas individualmente como cards no Jira. 
 Ao abrir qualquer item do quadro, a seção de detalhes apresenta a descrição completa da funcionalidade, acompanhada de seus respectivos requisitos e critérios de aceitação. 
 
 O acompanhamento pode ser feito pelo link: https://s03-gerenciador.atlassian.net/jira/software/projects/SCRUM/pages.
 
-## 2) Uso de Inteligência Artificial no Projeto
+## 3) Uso de Inteligência Artificial no Projeto
 
 ### Uso de IA (Gemini) — Job de Lint no Jenkinsfile (Willian)
 Estes são os registros do uso do Google Gemini para a configuração da etapa de análise estática de código (Lint) no pipeline:
