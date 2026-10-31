@@ -51,16 +51,16 @@ Estes são os detalhes do uso da IA para validação do código antes do envio a
 - **Prompt e Objetivo:** Solicitação de revisão preventiva da lógica e da sintaxe do código desenvolvido pelo integrante (Gabriel Perroni), visando validar se a implementação estava correta antes de subir as alterações para o repositório.
 - **Avaliação e Ajustes (Troubleshooting):** A resposta da IA foi satisfatória, servindo para confirmar que o código estava correto e pronto para o `commit`, evitando erros na esteira do projeto sem necessidade de retrabalho.
 
-Uso de IA — Validação dos Testes do Cálculo de Custo e do Stage de Build (Leonardo Vieira)
+### Uso de IA — Validação dos Testes do Cálculo de Custo e do Stage de Build (Leonardo Vieira)
 Estes são os detalhes do uso da IA como apoio de validação:
-* Ferramenta Utilizada: Gemini.
-* Prompt e Objetivo: após implementar os testes do serviço CalculadorCusto (casos com mock, sem mock e um negativo) e montar o stage de Build no Jenkinsfile, pedi à IA para validar se a lógica e a sintaxe estavam corretas, se os cenários de teste cobriam bem o serviço e se o uso do mock estava adequado.
-* Avaliação e Ajustes (Troubleshooting): a IA confirmou que a implementação estava correta e apontou pequenos ajustes de sintaxe, que foram revisados e aplicados antes de subir para o repositório.
+- **Ferramenta Utilizada: Gemini.
+- **Prompt e Objetivo: após implementar os testes do serviço CalculadorCusto (casos com mock, sem mock e um negativo) e montar o stage de Build no Jenkinsfile, pedi à IA para validar se a lógica e a sintaxe estavam corretas, se os cenários de teste cobriam bem o serviço e se o uso do mock estava adequado.
+- **Avaliação e Ajustes (Troubleshooting): a IA confirmou que a implementação estava correta e apontou pequenos ajustes de sintaxe, que foram revisados e aplicados antes de subir para o repositório.
 
-Uso de IA — Correção da Suíte de Testes (Leonardo Vieira)
-* Ferramenta Utilizada: Claude .
-* Prompt e Objetivo: ao rodar a suíte de testes, ela estava quebrando por causa de uma dependência não declarada (freezegun) e de uma fixture inexistente no placeholder do otimizador. Pedi à IA para ajudar a identificar a causa dos erros e confirmar a correção.
-* Avaliação e Ajustes (Troubleshooting): a IA ajudou a localizar os dois problemas, que foram corrigidos (declaração da freezegun no pyproject e ajuste do placeholder), deixando a suíte passando.
+### Uso de IA — Correção da Suíte de Testes (Leonardo Vieira)
+- **Ferramenta Utilizada: Gemini .
+- **Prompt e Objetivo: ao rodar a suíte de testes, ela estava quebrando por causa de uma dependência não declarada (freezegun) e de uma fixture inexistente no placeholder do otimizador. Pedi à IA para ajudar a identificar a causa dos erros e confirmar a correção.
+- **Avaliação e Ajustes (Troubleshooting): a IA ajudou a localizar os dois problemas, que foram corrigidos (declaração da freezegun no pyproject e ajuste do placeholder), deixando a suíte passando.
 
 ### Requisitos Funcionais
 Estes são os comportamentos e funcionalidades diretas que o usuário interage:
