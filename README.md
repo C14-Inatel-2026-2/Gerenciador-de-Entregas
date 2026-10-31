@@ -43,3 +43,12 @@ Estes são os detalhes do uso da IA para validação do código antes do envio a
 - **Ferramenta Utilizada:** Google Gemini.
 - **Prompt e Objetivo:** Solicitação de revisão preventiva da lógica e da sintaxe do código desenvolvido pelo integrante (Gabriel Perroni), visando validar se a implementação estava correta antes de subir as alterações para o repositório.
 - **Avaliação e Ajustes (Troubleshooting):** A resposta da IA foi satisfatória, servindo para confirmar que o código estava correto e pronto para o `commit`, evitando erros na esteira do projeto sem necessidade de retrabalho.
+
+### Requisitos Funcionais
+Estes são os comportamentos e funcionalidades diretas que o usuário interage:
+- **Cadastro e Gestão de Motoristas**: O sistema deve permitir o cadastro de novos motoristas, armazenando dados como nome, CNH e tipo de veículo.
+- **Cadastro e Gestão de Entregas:** O sistema deve permitir o registro de novas entregas, incluindo endereços de origem e destino e peso.
+- **Monitoramento de Status de Entregas:** O sistema deve listar e atualizar o status das entregas em tempo real.
+- **Acompanhamento da Situação dos Motoristas:** O sistema deve permitir listar e visualizar a situação atual dos motoristas.
+- **Algoritmo de Otimização de Rotas:** O sistema deve contar com um algoritmo capaz de calcular a rota ideal para maximizar a eficiência de tempo e combustível.
+- **Visualização do Mapa:** O sistema deve exibir visualmente em um mapa interativo a rota otimizada gerada para o trajeto dos motoristas.
