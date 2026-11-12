@@ -12,3 +12,10 @@ class MockProvedorMapas(ProvedorMapas):
 def otimizador():
     provedor_mock = MockProvedorMapas()
     return OtimizadorRotas(provedor_mapas=provedor_mock)
+
+def test_processar_rota_com_sucesso(otimizador):
+    rota = otimizador.processar_rota("Santa Rita", "Pouso Alegre")
+    assert rota.origem == "Santa Rita"
+    assert rota.destino == "Pouso Alegre"
+    assert rota.distancia_km == 50.0
+    assert rota.tempo_estimado_horas == 1.0
