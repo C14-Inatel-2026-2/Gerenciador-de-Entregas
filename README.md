@@ -62,6 +62,39 @@ Estes são os detalhes do uso da IA como apoio de validação:
 - **Prompt e Objetivo: ao rodar a suíte de testes, ela estava quebrando por causa de uma dependência não declarada (freezegun) e de uma fixture inexistente no placeholder do otimizador. Pedi à IA para ajudar a identificar a causa dos erros e confirmar a correção.
 - **Avaliação e Ajustes (Troubleshooting): a IA ajudou a localizar os dois problemas, que foram corrigidos (declaração da freezegun no pyproject e ajuste do placeholder), deixando a suíte passando.
 
+### Uso de IA (Gemini) — provedor_mapas.py (Diego Victor)
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Dúvida Principal:** Solicitação de uma estrutura de interface de geolocalização que pudesse ser injetada no serviço principal de rotas, originada de uma tarefa mapeada no Jira, para ser desenvolvida na branch isolada `feature/otimizador-de-rotas`.
+- **Código Gerado pela IA:** Criação da interface abstrata `ProvedorMapas`, estabelecendo o contrato do método `calcular_distancia_e_tempo`.
+  - **Por que foi feito:** Para evitar o acoplamento direto com serviços reais de geolocalização (como Google Maps), permitindo que a aplicação seja testada em isolamento total, sem chamadas de rede externas ou custos de API.
+- **Avaliação e Ajustes (Troubleshooting):** A solução estrutural fornecida pela IA foi totalmente satisfatória, garantindo o desacoplamento necessário para a arquitetura de testes.
+
+### Uso de IA (Gemini) — otimizador_rotas.py (Diego Victor)
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Dúvida Principal:** Desenvolvimento completo do serviço `OtimizadorRotas` aplicando injeção de dependências e regras de negócio logísticas (prioridade de pacotes).
+- **Código Gerado pela IA:** A IA construiu a classe principal com foco em regras de negócio robustas, detalhadas da seguinte forma:
+  - **Injeção de Dependência (`__init__`):** O construtor recebe a interface `ProvedorMapas`. **Por que foi feito:** Para que a classe consuma o provedor de forma genérica, facilitando a substituição por Mocks durante a execução dos testes unitários.
+  - **Validação de Entradas (`processar_rota`):** Inclusão de verificações `if not origem or not origem.strip()`. **Por que foi feito:** Para impedir o processamento de viagens com dados em branco, testando o comportamento defensivo e lançando a exceção customizada `DadoInvalidoException` logo no início do fluxo.
+  - **Regra de Negócio de Prioridade (`otimizar_entregas`):** Utilizou-se a função nativa `sorted` do Python passando uma função lambda (`key=lambda entrega: entrega.get_prioridade().value`) com `reverse=True`. **Por que foi feito:** Para garantir que a frota sempre atenda primeiro as entregas mais críticas (Prioridade ALTA, seguida de NORMAL e BAIXA), satisfazendo a lógica central do módulo.
+  - **Orquestração Final (`preparar_viagem`):** Atua como o integrador da classe. **Por que foi feito:** Para fornecer uma interface única e simplificada que processa a rota e ordena as entregas em uma única chamada, devolvendo uma tupla pronta para uso pelo sistema.
+- **Avaliação e Ajustes (Troubleshooting):** A implementação sugerida foi satisfatória. A IA estruturou a classe de forma isolada, defensiva e alinhada perfeitamente aos requisitos.
+
+### Uso de IA (Gemini) — test_otimizador_rotas.py (Diego Victor)
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Dúvida Principal:** Solicitação para estruturar testes no Pytest visando cobrir 100% das regras da classe principal, e requisições subsequentes de troubleshooting para resolução de erros no terminal PowerShell durante a execução da suíte.
+- **Código Gerado pela IA:** Os testes foram estruturados cobrindo todos os cenários, aplicando Mocks e Asserts:
+  - **Simulação de Integração (`MockProvedorMapas` e `@pytest.fixture`):** Criação de classe falsa que retorna sempre 50.0 km e 1.0 hora, injetada no otimizador via fixture. **Por que foi feito:** Para isolar o teste da internet. O objetivo é testar apenas a lógica local, garantindo que o sistema lide com a resposta do mapa sem depender de uma API externa.
+  - **Cenário de Sucesso (`test_processar_rota_com_sucesso`):** Verifica montagem da rota com dados de Mock. **Por que foi feito:** Para garantir a instanciação do objeto `Rota` sem perdas de dados.
+  - **Cenários de Falha (`pytest.raises`):** Passagem de atributos inválidos. **Por que foi feito:** Validar se o sistema efetivamente lança o `DadoInvalidoException` ao receber strings vazias.
+  - **Cenário de Regra de Negócio:** Envio de lista embaralhada para otimizador. **Por que foi feito:** Atestar visualmente/posicionalmente se a função lambda do método de prioridade funciona corretamente.
+  - **Cenário de Integração:** Executa o método orquestrador. **Por que foi feito:** Confirmar que métodos menores trabalham em conjunto, devolvendo a tupla corretamente.
+- **Avaliação e Ajustes (Troubleshooting):** A resposta e o suporte da IA **não foram satisfatórios** durante a execução, gerando forte atrito operacional:
+  - **Falha 1: Erro de Importação (`ModuleNotFoundError`):** O `conftest.py` falhou ao importar dependências, pois a raiz do projeto não estava no `PYTHONPATH`. **Ajuste:** A IA primeiramente sugeriu a correção ineficaz `python -m pytest`. O erro só foi resolvido quando a IA instruiu a instalação do projeto em modo editável com `pip install -e .`, criando um vínculo definitivo com o ambiente virtual (`.venv`).
+  - **Falha 2: Erro de Diretório Ausente:** A IA forneceu seguidas vezes o comando com o caminho incompleto (`tests/test_otimizador_rotas.py`), ignorando o contexto visual das capturas de tela. **Ajuste:** O comando foi corrigido manualmente para o caminho absoluto exato (`pytest tests/unitarios/test_otimizador_rotas.py`).
+  - **Conclusão:** A validação final (os 5 cenários passando com sucesso) só ocorreu por correção posterior das sucessivas falhas operacionais e de diagnóstico ambiental cometidas pela própria ferramenta.
+
+## 4) Requisitos
+
 ### Requisitos Funcionais
 Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Cadastro e Gestão de Motoristas**: O sistema deve permitir o cadastro de novos motoristas, armazenando dados como nome, CNH e tipo de veículo.
