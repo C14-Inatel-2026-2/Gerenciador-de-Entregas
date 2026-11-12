@@ -40,3 +40,12 @@ def test_otimizar_entregas_ordena_por_prioridade(otimizador):
     assert entregas_otimizadas[0].get_prioridade() == Prioridade.ALTA
     assert entregas_otimizadas[1].get_prioridade() == Prioridade.NORMAL
     assert entregas_otimizadas[2].get_prioridade() == Prioridade.BAIXA
+
+
+def test_preparar_viagem_retorna_dados_corretos(otimizador):
+    entrega = Entrega(1, "A", "B", 10.0, Prioridade.ALTA)
+    rota, entregas_otimizadas = otimizador.preparar_viagem("Santa Rita", "Pouso Alegre", [entrega])
+
+    assert rota.origem == "Santa Rita"
+    assert len(entregas_otimizadas) == 1
+    assert entregas_otimizadas[0].get_prioridade() == Prioridade.ALTA
