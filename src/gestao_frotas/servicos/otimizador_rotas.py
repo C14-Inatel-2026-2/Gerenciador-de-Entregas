@@ -22,3 +22,9 @@ class OtimizadorRotas:
 
     def otimizar_entregas(self, entregas: list[Entrega]) -> list[Entrega]:
         return sorted(entregas, key=lambda entrega: entrega.get_prioridade().value, reverse=True)
+
+    def preparar_viagem(self, origem: str, destino: str, entregas: list[Entrega]) -> tuple[Rota, list[Entrega]]:
+        rota = self.processar_rota(origem, destino)
+        entregas_otimizadas = self.otimizar_entregas(entregas)
+
+        return rota, entregas_otimizadas
