@@ -19,3 +19,11 @@ def test_processar_rota_com_sucesso(otimizador):
     assert rota.destino == "Pouso Alegre"
     assert rota.distancia_km == 50.0
     assert rota.tempo_estimado_horas == 1.0
+
+    def test_origem_vazia_deve_lancar_excecao(otimizador):
+        with pytest.raises(DadoInvalidoException):
+            otimizador.processar_rota("", "Pouso Alegre")
+
+    def test_destino_vazio_deve_lancar_excecao(otimizador):
+        with pytest.raises(DadoInvalidoException):
+            otimizador.processar_rota("Santa Rita", "   ")
