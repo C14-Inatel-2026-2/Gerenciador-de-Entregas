@@ -19,3 +19,6 @@ class OtimizadorRotas:
         distancia_km, tempo_estimado_horas = self.provedor_mapas.calcular_distancia_e_tempo(origem, destino)
 
         return Rota(origem, destino, distancia_km, tempo_estimado_horas)
+
+    def otimizar_entregas(self, entregas: list[Entrega]) -> list[Entrega]:
+        return sorted(entregas, key=lambda entrega: entrega.get_prioridade().value, reverse=True)
