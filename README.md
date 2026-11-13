@@ -93,6 +93,30 @@ Estes são os detalhes do uso da IA como apoio de validação:
   - **Falha 2: Erro de Diretório Ausente:** A IA forneceu seguidas vezes o comando com o caminho incompleto (`tests/test_otimizador_rotas.py`), ignorando o contexto visual das capturas de tela. **Ajuste:** O comando foi corrigido manualmente para o caminho absoluto exato (`pytest tests/unitarios/test_otimizador_rotas.py`).
   - **Conclusão:** A validação final (os 5 cenários passando com sucesso) só ocorreu por correção posterior das sucessivas falhas operacionais e de diagnóstico ambiental cometidas pela própria ferramenta.
 
+### Uso de IA (Gemini) — otimizador_rotas.py e provedor_mapas_grafo.py (Diego Victor)
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Dúvida Principal:** Solicitação para refatorar o núcleo de roteamento, integrando a biblioteca `networkx` de forma limpa, e alterando a regra de negócio do algoritmo principal para traçar rotas logísticas por distância (quilometragem) ao invés de prioridade estática.
+- **Código Gerado pela IA:** O código de produção foi reestruturado e dividido para manter a arquitetura do projeto:
+  - **Criação do Adapter (`ProvedorMapasGrafo`):** Implementação de uma classe na camada de serviços utilizando o NetworkX para hospedar nós e arestas com pesos (km e tempo). **Por que foi feito:** Para isolar a dependência externa (lib de terceiros) e não quebrar a arquitetura baseada em interfaces.
+  - **Refatoração do Algoritmo (`otimizar_entregas`):** Remoção do uso de função lambda para prioridade (ALTA/BAIXA) e adoção do algoritmo logístico de "Vizinho Mais Próximo" (Nearest Neighbor). **Por que foi feito:** Pois houve uma mudança de negócio estrutural: antes o caminho era categorizado por PRIORIDADE e percebeu-se a necessidade de adotar um grafo utilizando QUILOMETRAGEM, calculando dinamicamente a menor distância de forma contínua.
+  - **Atualização de Orquestração (`preparar_viagem`):** Repasse da variável `origem` para a fila de processamento. **Por que foi feito:** Para fornecer ao novo algoritmo o ponto de partida exato do caminhão.
+  - **Conclusão:** A refatoração arquitetural foi concluída com sucesso (Graph e Vizinho Mais Próximo), mas demandou controle rigoroso sobre o fluxo e o escopo das alterações entregues pela ferramenta.
+
+
+
+### Uso de IA (Gemini) — test_otimizador_rotas.py (Diego Victor)
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Dúvida Principal:** Solicitação para reestruturar os testes no Pytest visando cobrir a nova regra de negócio do otimizador de rotas (que passou a utilizar um grafo de distâncias em vez de prioridade estática), exigindo um cenário complexo com múltiplas cidades, além de requisições de troubleshooting para correção de caminhos de diretório no terminal.
+- **Código Gerado pela IA:** Os testes foram estruturados cobrindo todos os cenários, aplicando Mocks dinâmicos e Asserts:
+  - **Simulação de Integração (`unittest.mock.Mock` e `@pytest.fixture`):** Criação de um mock dinâmico que simula um grafo de distâncias em quilometragem e tempo entre várias cidades do Sul de Minas. **Por que foi feito:** Para isolar o teste da internet e fornecer ao algoritmo as distâncias necessárias para a tomada de decisão localmente, sem depender da biblioteca externa.
+  - **Cenário de Sucesso (`test_processar_rota_com_sucesso`):** Verifica montagem da rota com dados de Mock. **Por que foi feito:** Para garantir a instanciação do objeto `Rota` capturando a distância em km sem perdas de dados.
+  - **Cenários de Falha (`pytest.raises`):** Passagem de atributos inválidos. **Por que foi feito:** Validar o lançamento de `DadoInvalidoException` ao receber origens ou destinos vazios.
+  - **Cenário de Regra de Negócio (`test_otimizar_entregas_complexa_com_cinco_cidades`):** Envio de lista com 5 cidades para o otimizador (Santa Rita, Pouso Alegre, Borda da Mata, Cachoeira de Minas e Itajubá). **Por que foi feito:** Pois ocorreu forte mudança de negócio: antes o caminho era categorizado por PRIORIDADE estática e percebeu-se a necessidade de um grafo utilizando QUILOMETRAGEM. Este teste atesta se a lógica traça a rota perfeita conectando múltiplos nós.
+  - **Cenário de Integração (`test_preparar_viagem_retorna_dados_corretos`):** Executa o método orquestrador repassando a origem inicial. **Por que foi feito:** Confirmar que os métodos menores trabalham em conjunto com a nova estrutura de parâmetros, devolvendo a tupla corretamente.
+- **Avaliação e Ajustes (Troubleshooting):** A resposta e o suporte da IA **não foram satisfatórios** durante a execução, gerando forte atrito operacional:
+  - **Falha: Cenário de Teste Superficial:** Ao mudar a regra para distância, a IA gerou inicialmente um teste de lógica utilizando apenas 2 cidades. **Ajuste:** Foi necessário intervir e exigir a criação de um cenário mais robusto com 5 cidades. O teste com 2 cidades não foi satisfatório para comprovar o funcionamento de um algoritmo de roteamento baseado em grafos na vida real.
+    - **Conclusão:** A validação final (os cenários passando com sucesso, atestando a nova regra de quilometragem) só ocorreu por correção direta das falhas de escopo analítico (teste inicial muito fraco) e de diagnóstico de ambiente cometidas pela própria ferramenta.
+
 ## 4) Requisitos
 
 ### Requisitos Funcionais
@@ -113,3 +137,17 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Manutenibilidade**: o código é organizado em camadas (modelos, serviços, interfaces e repositórios), separando os dados das regras de negócio, o que facilita a manutenção e a evolução.
 - **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
 - **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
+
+### 5. Refatorações Implementadas 
+
+(Diego Victor)
+
+Foram realizadas duas refatorações  no código de produção para alinhar o sistema às novas regras de negócio e garantir um código mais limpo:
+
+1. **Refatoração da Lógica de Roteamento (`otimizador_rotas.py`):**
+   - **O que foi feito:** Substituição da ordenação estática por prioridade (que usava ALTA/BAIXA) pela implementação do algoritmo logístico de "Vizinho Mais Próximo" (Nearest Neighbor) consumindo dados de um grafo.
+   - **Por que foi feito:** Mudança estrutural na regra de negócio. Percebeu-se a necessidade de traçar as rotas utilizando quilometragem (distância real) em vez de categorias arbitrárias de prioridade. Isso permite que o sistema calcule dinamicamente o caminho mais curto, conectando múltiplos nós consecutivos e otimizando a viagem inteira do caminhão.
+
+2. **Simplificação da Validação de Parâmetros (método `processar_rota`):**
+   - **O que foi feito:** Remoção da checagem dupla/redundante de valores nulos (`if not origem or not origem.strip()`), mantendo apenas a validação de strings vazias com `if not origem.strip()`.
+   - **Por que foi feito:** Alinhamento técnico com a equipe. Concluiu-se formalmente que o sistema não vai permitir o cadastro sem colocar todas as informações Como essa trava já garante que nunca chegará uma string nula na requisição, a dupla checagem tornou-se uma "programação defensiva" redundante, e a sua remoção deixou o código mais limpo e direto.
