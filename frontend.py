@@ -6,6 +6,7 @@ import customtkinter as ctk
 import tkintermapview
 from tkinter import messagebox
 
+from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.veiculo import Veiculo
@@ -35,15 +36,51 @@ class App(ctk.CTk):
         super().__init__()
 
         self.title("Gerenciador de Entregas")
-        self.geometry("600x600")
+        self.geometry("600x550")
         self.resizable(True, True)
 
         self.historico_entregas = []
-        self.mostrar_tela_inicial()
+        self.motoristas: list[Motorista] = []
+        self.mostrar_tela_login()
 
     def limpar_janela(self):
         for widget in self.winfo_children():
             widget.destroy()
+
+    def mostrar_tela_login(self):
+        self.limpar_janela()
+
+        titulo = ctk.CTkLabel(self, text="Login", font=("Arial", 20, "bold"))
+        titulo.pack(pady=30)
+
+        self.input_user = ctk.CTkEntry(self, placeholder_text="User", width=280, height=35)
+        self.input_user.pack(pady=8)
+
+        self.input_senha = ctk.CTkEntry(self, placeholder_text="Senha", width=280, height=35)
+        self.input_senha.pack(pady=8)
+
+        btn_confirmar = ctk.CTkButton (
+            self,
+            text="Confirmar",
+            command=self.confirmar_login,
+            font=("Arial", 14),
+        )
+        btn_confirmar.pack(pady=10)
+
+    def confirmar_login(self):
+        if not self.input_user.get() or not self.input_senha.get():
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos")
+            return
+
+        if self.input_user.get().strip() == "admin" and self.input_senha.get().strip() == "admin":
+            self.mostrar_tela_inicial()
+
+        motorista = Motorista(1, "abc", "x", "1234")
+        self.motoristas.append(motorista)
+
+        for mot in self.motoristas:
+            if mot.nome == self.input_user.get() and mot.senha == self.input_senha.get():
+                self.mostrar_tela_entregas()
 
     def mostrar_tela_inicial(self):
         self.limpar_janela()
@@ -309,6 +346,10 @@ class App(ctk.CTk):
         dlon = lon2 - lon1
         a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
         return 2 * raio_terra_km * math.asin(math.sqrt(a))
+
+    def mostrar_tela_entregas(self):
+        self.limpar_janela()
+        return
 
 
 if __name__ == "__main__":
