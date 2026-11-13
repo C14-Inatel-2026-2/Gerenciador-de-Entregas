@@ -677,75 +677,21 @@ class App(ctk.CTk):
         nomes_entregas = [(str(entrega.id) + ": " + str(entrega.destino)) for entrega in self.historico_entregas]
         if not nomes_entregas:
             nomes_entregas = ["Nenhuma entrega cadastrada"]
-        self.input_entrega = ctk.CTkOptionMenu(
-            frame,
-            values=nomes_entregas,
-            width=320,
-            height=40,
-            corner_radius=8
-        )
-        self.input_entrega.pack(pady=10)
 
-        if self.historico_entregas:
-            self.input_entrega.set("Selecione a entrega")
-        else:
-            self.input_entrega.set("Nenhuma entrega cadastrada")
+        for _ in range(5):
+            self.input_entrega = ctk.CTkOptionMenu(
+                frame,
+                values=nomes_entregas,
+                width=320,
+                height=40,
+                corner_radius=8
+            )
+            self.input_entrega.pack(pady=10)
 
-        self.input_entrega = ctk.CTkOptionMenu(
-            frame,
-            values=nomes_entregas,
-            width=320,
-            height=40,
-            corner_radius=8
-        )
-        self.input_entrega.pack(pady=10)
-
-        if self.historico_entregas:
-            self.input_entrega.set("Selecione a entrega")
-        else:
-            self.input_entrega.set("Nenhuma entrega cadastrada")
-
-        self.input_entrega = ctk.CTkOptionMenu(
-            frame,
-            values=nomes_entregas,
-            width=320,
-            height=40,
-            corner_radius=8
-        )
-        self.input_entrega.pack(pady=10)
-
-        if self.historico_entregas:
-            self.input_entrega.set("Selecione a entrega")
-        else:
-            self.input_entrega.set("Nenhuma entrega cadastrada")
-
-        self.input_entrega = ctk.CTkOptionMenu(
-            frame,
-            values=nomes_entregas,
-            width=320,
-            height=40,
-            corner_radius=8
-        )
-        self.input_entrega.pack(pady=10)
-
-        if self.historico_entregas:
-            self.input_entrega.set("Selecione a entrega")
-        else:
-            self.input_entrega.set("Nenhuma entrega cadastrada")
-
-        self.input_entrega = ctk.CTkOptionMenu(
-            frame,
-            values=nomes_entregas,
-            width=320,
-            height=40,
-            corner_radius=8
-        )
-        self.input_entrega.pack(pady=10)
-
-        if self.historico_entregas:
-            self.input_entrega.set("Selecione a entrega")
-        else:
-            self.input_entrega.set("Nenhuma entrega cadastrada")
+            if self.historico_entregas:
+                self.input_entrega.set("Selecione a entrega")
+            else:
+                self.input_entrega.set("Nenhuma entrega cadastrada")
 
         frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
         frame_botoes.pack(pady=(35, 0))
