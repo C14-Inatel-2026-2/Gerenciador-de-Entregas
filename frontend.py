@@ -43,7 +43,7 @@ class App(ctk.CTk):
 
         self.historico_entregas = []
         self.motoristas: list[Motorista] = []
-        self.mostrar_tela_inicial()
+        self.mostrar_tela_login()
 
     def limpar_janela(self):
         for widget in self.winfo_children():
@@ -52,27 +52,36 @@ class App(ctk.CTk):
     def mostrar_tela_login(self):
         self.limpar_janela()
 
-        frame_central = ctk.CTkFrame(self, fg_color="transparent")
-        frame_central.place(relx=0.5, rely=0.5, anchor="center")
+        frame_central = ctk.CTkFrame(self, fg_color="#051121", border_width=1,
+                                     border_color="gray", corner_radius=16)
+        frame_central.place(relx=0.5, rely=0.5, relwidth=0.6, relheight=0.45, anchor="center")
 
         titulo = ctk.CTkLabel(
             frame_central,
             text="Login",
             font=("Helvetica", 24, "bold")
         )
-        titulo.pack(pady=(0, 10))
+        titulo.pack(pady=(20))
 
         self.input_user = ctk.CTkEntry(frame_central, placeholder_text="User", width=280, height=35)
         self.input_user.pack(pady=8)
 
-        self.input_senha = ctk.CTkEntry(frame_central, placeholder_text="Senha", width=280, height=35)
+        self.input_senha = ctk.CTkEntry(frame_central, placeholder_text="Senha", width=280, height=35, show="*")
         self.input_senha.pack(pady=8)
+
+        self.label_erro = ctk.CTkLabel(
+            frame_central,
+            text="",
+            text_color="#ff4d4d",  # Vermelho elegante para alertas
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        self.label_erro.pack(pady=(0, 3))
 
         btn_confirmar = ctk.CTkButton (
             frame_central,
             text="Confirmar",
             command=self.confirmar_login,
-            font=("Arial", 14),
+            font=("Arial", 14)
         )
         btn_confirmar.pack(pady=10)
 
@@ -81,15 +90,22 @@ class App(ctk.CTk):
             messagebox.showerror("Erro", "Por favor, preencha todos os campos")
             return
 
-        if self.input_user.get().strip() == "admin" and self.input_senha.get().strip() == "admin":
-            self.mostrar_tela_inicial()
-
-        motorista = Motorista(1, "abc", "x", "1234")
+        motorista = Motorista(1, "abc", "1234")
         self.motoristas.append(motorista)
 
+        if self.input_user.get().strip() == "admin" and self.input_senha.get().strip() == "admin":
+            self.mostrar_tela_inicial()
+            return
+
+        login_sucesso = False
         for mot in self.motoristas:
-            if mot.nome == self.input_user.get() and mot.senha == self.input_senha.get():
-                self.mostrar_tela_entregas()
+            if mot.nome == self.input_user.get() and mot.cnh == self.input_senha.get():
+                login_sucesso = True
+        if login_sucesso:
+            self.label_erro.configure(text="")
+            self.mostrar_tela_entregas()
+        else:
+            self.label_erro.configure(text="Usuário ou senha incorretos. Tente novamente.")
 
     def mostrar_tela_inicial(self):
         self.limpar_janela()
