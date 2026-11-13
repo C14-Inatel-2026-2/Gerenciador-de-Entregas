@@ -25,13 +25,12 @@ class Viagem:
     # Construtor
 
     def __init__(
-        self, motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega],
+        self, motorista: Motorista, veiculo: Veiculo, entregas: list[Entrega],
             horario_inicio: datetime.datetime = None, horario_termino: datetime.datetime = None,
             status: StatusViagem = StatusViagem.PENDENTE):
 
         self.__motorista = motorista
         self.__veiculo = veiculo
-        self.__rota = rota
         self.__entregas = entregas if entregas is not None else []
         self.__horario_inicio = horario_inicio
         self.__horario_termino = horario_termino
