@@ -22,3 +22,6 @@ class CalculadorCusto:
         litros = self.litros_necessarios(rota, veiculo)
         preco = self.__provedor.preco_por_litro(uf)
         return litros * preco
+
+    def calcular_custo_total(self, rota: Rota, veiculo: Veiculo, uf: str) -> float:
+        return self.calcular_custo_combustivel(rota, veiculo, uf) + self.custo_por_distancia(rota, veiculo)

@@ -61,3 +61,12 @@ def test_consumo_zero_lanca_excecao():
 
     with pytest.raises(DadoInvalidoException):
         calculador.litros_necessarios(rota, veiculo)
+
+
+def test_calcular_custo_total_usando_mock(combustivel_falso):
+    rota = Rota("A", "B", 300.0, 5.0)
+    veiculo = criar_veiculo(consumo_medio=10.0, custo_por_km=1.5)
+    calculador = CalculadorCusto(combustivel_falso)
+
+    # combustivel 30L * 6 = 180, distancia 300 * 1.5 = 450, total 630
+    assert calculador.calcular_custo_total(rota, veiculo, "MG") == 630.0
