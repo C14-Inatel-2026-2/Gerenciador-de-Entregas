@@ -6,7 +6,8 @@ import customtkinter as ctk
 import tkintermapview
 from tkinter import messagebox
 
-from gestao_frotas.modelos.entrega import Prioridade
+from gestao_frotas.modelos import motorista
+from gestao_frotas.modelos.entrega import Prioridade, Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.rota import Rota
@@ -164,6 +165,14 @@ class App(ctk.CTk):
         )
         btn_cadastrar_entrega.pack(anchor="w", padx=20, pady=8)
 
+        ctk.CTkButton(
+            frame,
+            text="+ Cadastrar Motorista",
+            command=self.mostrar_tela_cadastro_motorista,
+            font=("Arial", 14),
+            height=40,
+            width=200).pack(anchor="w", padx=20, pady=8)
+
         linha_cadastro = ctk.CTkFrame(frame, height=3, fg_color="gray")
         linha_cadastro.pack(fill="x", pady=5)
 
@@ -175,25 +184,50 @@ class App(ctk.CTk):
         )
         titulo.pack(fill="x", padx=20, pady=(20, 10))
 
+        topo_servicos = ctk.CTkFrame(frame, fg_color="transparent")
+        topo_servicos.pack(fill="x", padx=20, pady=(15, 5))
+
+        ctk.CTkButton(
+            topo_servicos,
+            text="Listar Motoristas",
+            command=self.mostrar_tela_motoristas,
+            font=("Arial", 14),
+            height=40,
+            width=200
+        ).pack(side="left")
+
         btn_calcular_custo = ctk.CTkButton(
-            frame,
+            topo_servicos,
             text="Calcular Custo da Viagem",
             command=self.mostrar_tela_custo,
             font=("Arial", 14),
             height=40,
             width = 200
         )
-        btn_calcular_custo.pack(anchor="w", padx=20, pady=10)
+        btn_calcular_custo.pack(side="right", padx=90)
+
+        bottom_servicos = ctk.CTkFrame(frame, fg_color="transparent")
+        bottom_servicos.pack(fill="x", padx=20, pady=(15, 5))
 
         btn_mapa = ctk.CTkButton(
-            frame,
+            bottom_servicos,
             text="Ver Mapa da Rota",
             command=self.mostrar_tela_mapa,
             font=("Arial", 14),
             height=40,
             width = 200
         )
-        btn_mapa.pack(anchor="w", padx=20, pady=10)
+        btn_mapa.pack(side="left")
+
+        btn_mapa = ctk.CTkButton(
+            bottom_servicos,
+            text="Iniciar Entrega",
+            command=self.mostrar_tela_viagens,
+            font=("Arial", 14),
+            height=40,
+            width=200
+        )
+        btn_mapa.pack(side="right", padx=90)
 
         footer_frame = ctk.CTkFrame(
             self,
@@ -298,43 +332,164 @@ class App(ctk.CTk):
         print(nova_entrega)
         self.mostrar_tela_inicial()
 
+    def mostrar_tela_cadastro_motorista(self):
+        self.limpar_janela()
+
+        frame = ctk.CTkFrame(self, corner_radius=16, fg_color=("black", "#051121"), border_color="grey", border_width=1)
+        frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.7, relheight=0.65)
+
+        ctk.CTkLabel(frame, text="Cadastrar Motorista",font=ctk.CTkFont(size=25, weight="bold")).pack(pady=25)
+
+        self.input_nome = ctk.CTkEntry(frame, placeholder_text="Nome", width=320, height=40, corner_radius=8)
+        self.input_nome.pack(pady=10)
+        self.input_cnh = ctk.CTkEntry(frame, placeholder_text="CNH", width=320, height=40, corner_radius=8)
+        self.input_cnh.pack(pady=10)
+
+        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_botoes.pack(pady=(35, 0))
+
+        ctk.CTkButton(
+            frame_botoes,
+            text="Salvar",
+          command=self.salvar_motorista,
+          fg_color="green", hover_color="darkgreen",
+          font=ctk.CTkFont(weight="bold"),
+          height=40, corner_radius=8, width=100
+          ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            frame_botoes,
+            text="Voltar",
+            command=self.mostrar_tela_inicial,
+            fg_color = "transparent",
+            border_width = 1,
+            text_color = ("gray10", "gray90"),
+            height = 40, width = 100, corner_radius = 8
+        ).pack(side="right", padx=10)
+
+    def salvar_motorista(self):
+        nome = self.input_nome.get().strip()
+        cnh = self.input_cnh.get().strip()
+        if not nome or not cnh:
+            messagebox.showerror("Erro", "Preencha nome e CNH.")
+            return
+        motorista = Motorista(len(self.motoristas) + 1, nome, cnh)
+        self.motoristas.append(motorista)
+        messagebox.showinfo("Sucesso", "Motorista cadastrado!")
+        self.mostrar_tela_inicial()
+
+    def mostrar_tela_motoristas(self):
+        self.limpar_janela()
+
+        frame = ctk.CTkFrame(self, fg_color="#030A21")
+        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=1, anchor="center")
+
+        ctk.CTkLabel(
+            frame,
+            text="Motoristas Cadastrados 📋",
+            font=("Arial", 26, "bold"),
+            text_color="white"
+        ).pack(pady=(25, 10))
+
+        scroll_frame = ctk.CTkScrollableFrame(
+            frame,
+            width=400,
+            height=300,
+            fg_color="#0b132b",
+            corner_radius=10
+        )
+        scroll_frame.pack(pady=10, fill="both", expand=True, padx=40)
+
+        if not self.motoristas:
+            ctk.CTkLabel(
+                scroll_frame,
+                text="Nenhum motorista cadastrado.",
+                font=("Arial", 14),
+                text_color="gray"
+            ).pack(pady=20)
+        else:
+            for motorista in self.motoristas:
+                item_card = ctk.CTkFrame(scroll_frame, fg_color="#1c2541", height=50, corner_radius=8)
+                item_card.pack(fill="x", pady=6, padx=10)
+                lbl_nome = ctk.CTkLabel(
+                    item_card,
+                    text=f"👤 {motorista.nome}",
+                    font=("Arial", 14, "bold"),
+                    text_color="white"
+                )
+                lbl_nome.pack(side="left", padx=15, pady=10)
+
+                lbl_status = ctk.CTkLabel(
+                    item_card,
+                    text=f"Status: {motorista.status}",
+                    font=("Arial", 12),
+                    text_color="#4ade80"
+                )
+                lbl_status.pack(side="right", padx=15, pady=10)
+
+        btn_voltar = ctk.CTkButton(
+            frame,
+            text="Voltar",
+            command=self.mostrar_tela_inicial,
+            font=("Arial", 14),
+            height=40,
+            width=200
+        )
+        btn_voltar.pack(pady=(10, 25))
+
     def mostrar_tela_custo(self):
         self.limpar_janela()
 
-        titulo = ctk.CTkLabel(self, text="Calcular Custo da Viagem", font=("Arial", 16, "bold"))
-        titulo.pack(pady=20)
+        frame = ctk.CTkFrame(self, corner_radius=16, fg_color=("black", "#051121"), border_color="grey", border_width=1)
+        frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.85)
 
-        self.input_distancia = ctk.CTkEntry(self, placeholder_text="Distância (km)", width=280, height=35)
-        self.input_distancia.pack(pady=8)
+        titulo = ctk.CTkLabel(frame, text="Calcular Custo da Viagem", font=("Arial", 25, "bold"))
+        titulo.pack(pady=25)
 
-        self.input_consumo = ctk.CTkEntry(self, placeholder_text="Consumo do veículo (km/l)", width=280, height=35)
-        self.input_consumo.pack(pady=8)
+        self.input_distancia = ctk.CTkEntry(frame, placeholder_text="Distância (km)",
+                                            corner_radius=8, width=320, height=40)
+        self.input_distancia.pack(pady=10)
 
-        self.input_custo_km = ctk.CTkEntry(self, placeholder_text="Custo por km (R$)", width=280, height=35)
-        self.input_custo_km.pack(pady=8)
+        self.input_consumo = ctk.CTkEntry(frame, placeholder_text="Consumo do veículo (km/l)",
+                                            corner_radius=8, width=320, height=40)
+        self.input_consumo.pack(pady=10)
 
-        self.input_preco_litro = ctk.CTkEntry(self, placeholder_text="Preço do litro (R$)", width=280, height=35)
-        self.input_preco_litro.pack(pady=8)
+        self.input_custo_km = ctk.CTkEntry(frame, placeholder_text="Custo por km (R$)",
+                                           corner_radius=8, width=320, height=40)
+        self.input_custo_km.pack(pady=10)
+
+        self.input_preco_litro = ctk.CTkEntry(frame, placeholder_text="Preço do litro (R$)",
+                                              corner_radius=8, width=320, height=40)
+        self.input_preco_litro.pack(pady=10)
+
+        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_botoes.pack(pady=(35, 0))
 
         btn_calcular = ctk.CTkButton(
-            self,
+            frame_botoes,
             text="Calcular Custo",
             command=self.calcular_custo,
             fg_color="green",
             hover_color="darkgreen",
-            height=35
+            font=ctk.CTkFont(weight="bold"),
+            height=35,
+            corner_radius=8,
+            width=150
         )
-        btn_calcular.pack(pady=12)
+        btn_calcular.pack(side="left", padx=10)
 
         btn_voltar = ctk.CTkButton(
-            self,
+            frame_botoes,
             text="Voltar",
             command=self.mostrar_tela_inicial,
-            fg_color="gray",
-            hover_color="darkgray",
-            height=30
+            fg_color="transparent",
+            height=30,
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            corner_radius=8,
+            width=100
         )
-        btn_voltar.pack(pady=12)
+        btn_voltar.pack(side="right", padx=10)
 
     def calcular_custo(self):
         try:
@@ -368,8 +523,15 @@ class App(ctk.CTk):
     def mostrar_tela_mapa(self):
         self.limpar_janela()
 
-        titulo = ctk.CTkLabel(self, text="Mapa da Rota", font=("Arial", 16, "bold"))
+        titulo = ctk.CTkLabel(self, text="Mapa da Rota", font=("Arial", 24, "bold"))
         titulo.pack(pady=10)
+
+        linha_divisoria = ctk.CTkFrame(
+            self,
+            height=3,
+            fg_color=("gray50", "gray90")
+        )
+        linha_divisoria.pack(fill="x", pady=(5, 5))
 
         self.input_mapa_origem = ctk.CTkEntry(
             self, placeholder_text="Endereço de origem", width=300, height=35
@@ -387,7 +549,8 @@ class App(ctk.CTk):
             command=self.ver_rota_no_mapa,
             fg_color="green",
             hover_color="darkgreen",
-            height=35
+            height=35,
+            width=60,
         )
         btn_rota.pack(pady=8)
 
@@ -400,9 +563,10 @@ class App(ctk.CTk):
             self,
             text="Voltar",
             command=self.mostrar_tela_inicial,
-            fg_color="gray",
-            hover_color="darkgray",
-            height=30
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            height=40, width=60, corner_radius=8
         )
         btn_voltar.pack(pady=5)
 
@@ -479,6 +643,131 @@ class App(ctk.CTk):
     def mostrar_tela_entregas(self):
         self.limpar_janela()
         return
+
+    def mostrar_tela_viagens(self):
+        self.limpar_janela()
+
+        frame = ctk.CTkScrollableFrame(self, corner_radius=16, fg_color=("black", "#051121"), border_color="grey", border_width=1)
+        frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.8, relheight=0.8)
+
+        ctk.CTkLabel(frame, text="Iniciar Entregas", font=ctk.CTkFont(size=25, weight="bold")).pack(pady=25)
+
+        titulo = ctk.CTkLabel(frame, text="Motorista", font=ctk.CTkFont(size=14, weight="bold"))
+        titulo.pack(pady=8)
+        nomes_motoristas = [motorista.nome for motorista in self.motoristas]
+        if not nomes_motoristas:
+            nomes_motoristas = ["Nenhum motorista cadastrado"]
+        self.input_motorista = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_motoristas,
+            width=320,
+            height=40,
+            corner_radius=8
+            )
+        self.input_motorista.pack(pady=10)
+
+        if self.motoristas:
+            self.input_motorista.set("Selecione o motorista")
+        else:
+            self.input_motorista.set("Nenhum motorista cadastrado")
+
+
+        titulo = ctk.CTkLabel(frame, text="Entregas", font=ctk.CTkFont(size=14, weight="bold"))
+        titulo.pack(pady=8)
+        nomes_entregas = [(str(entrega.id) + ": " + str(entrega.destino)) for entrega in self.historico_entregas]
+        if not nomes_entregas:
+            nomes_entregas = ["Nenhuma entrega cadastrada"]
+        self.input_entrega = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_entregas,
+            width=320,
+            height=40,
+            corner_radius=8
+        )
+        self.input_entrega.pack(pady=10)
+
+        if self.historico_entregas:
+            self.input_entrega.set("Selecione a entrega")
+        else:
+            self.input_entrega.set("Nenhuma entrega cadastrada")
+
+        self.input_entrega = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_entregas,
+            width=320,
+            height=40,
+            corner_radius=8
+        )
+        self.input_entrega.pack(pady=10)
+
+        if self.historico_entregas:
+            self.input_entrega.set("Selecione a entrega")
+        else:
+            self.input_entrega.set("Nenhuma entrega cadastrada")
+
+        self.input_entrega = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_entregas,
+            width=320,
+            height=40,
+            corner_radius=8
+        )
+        self.input_entrega.pack(pady=10)
+
+        if self.historico_entregas:
+            self.input_entrega.set("Selecione a entrega")
+        else:
+            self.input_entrega.set("Nenhuma entrega cadastrada")
+
+        self.input_entrega = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_entregas,
+            width=320,
+            height=40,
+            corner_radius=8
+        )
+        self.input_entrega.pack(pady=10)
+
+        if self.historico_entregas:
+            self.input_entrega.set("Selecione a entrega")
+        else:
+            self.input_entrega.set("Nenhuma entrega cadastrada")
+
+        self.input_entrega = ctk.CTkOptionMenu(
+            frame,
+            values=nomes_entregas,
+            width=320,
+            height=40,
+            corner_radius=8
+        )
+        self.input_entrega.pack(pady=10)
+
+        if self.historico_entregas:
+            self.input_entrega.set("Selecione a entrega")
+        else:
+            self.input_entrega.set("Nenhuma entrega cadastrada")
+
+        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_botoes.pack(pady=(35, 0))
+
+        ctk.CTkButton(
+            frame_botoes,
+            text="Salvar",
+            command=self.salvar_motorista,
+            fg_color="green", hover_color="darkgreen",
+            font=ctk.CTkFont(weight="bold"),
+            height=40, corner_radius=8, width=100
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            frame_botoes,
+            text="Voltar",
+            command=self.mostrar_tela_inicial,
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            height=40, width=100, corner_radius=8
+        ).pack(side="right", padx=10)
 
 
 if __name__ == "__main__":

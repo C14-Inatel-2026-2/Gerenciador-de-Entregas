@@ -29,22 +29,11 @@ class GerenciadorViagens:
                 f'O motorista {motorista.nome} não está disponível para entrega.'
             )
 
-        '''
-        try:
-            motorista.atribuir_veiculo(veiculo)
-        except ValueError:
-            raise DadoInvalidoException (
-                f'O veículo não pode ser atribuído a esse motorista.'
-            )
-        
         calculador = CalculadorCusto(None)
         custo_total = calculador.calcular_custo_combustivel(rota, veiculo, '')
         custo_total +=  calculador.custo_por_distancia(rota, veiculo)
 
-        viagem.addCustoTotal(custo_total)
-        '''
-
-        viagem = Viagem(motorista, veiculo, rota, entregas, horario_inicio, horario_termino)
+        viagem = Viagem(motorista, veiculo, entregas, horario_inicio, horario_termino)
 
         self.__viagens_em_andamento.append(viagem)
         viagem.atualizar_status(StatusViagem.EM_ANDAMENTO)
