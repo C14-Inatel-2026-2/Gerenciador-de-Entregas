@@ -113,3 +113,17 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Manutenibilidade**: o código é organizado em camadas (modelos, serviços, interfaces e repositórios), separando os dados das regras de negócio, o que facilita a manutenção e a evolução.
 - **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
 - **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
+
+## 5) Refactorings
+
+### Refactoring 1 — Extract Method: Validação de Status do Motorista
+- **Code Smell:** Código duplicado na validação do status do motorista, realizada tanto no construtor quanto no método `atualizar_status`.
+- **Refactoring aplicado:** Extração da validação para o método `_validar_status()`.
+- **Justificativa:** Centralizar a regra de validação, evitar duplicação de código e facilitar futuras manutenções.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
+
+### Refactoring 2 — Extract Method: Validação de Veículo do Motorista
+- **Code Smell:** O método `atribuir_veiculo()` acumulava duas responsabilidades: validar se o motorista pode dirigir o veículo e realizar sua atribuição.
+- **Refactoring aplicado:** Extração da validação para o método `_validar_veiculo()`.
+- **Justificativa:** Separar as responsabilidades, melhorar a organização do código e facilitar a manutenção e os testes.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
