@@ -1,4 +1,3 @@
-
 class Motorista:
     STATUS_DISPONIVEL = "disponível"
     STATUS_EM_VIAGEM = "em viagem"
@@ -26,10 +25,12 @@ class Motorista:
         self._validar_status(novo_status)
         self.status = novo_status
 
-    def atribuir_veiculo(self, veiculo):
+    def _validar_veiculo(self, veiculo):
         tipos_permitidos = self.cnh.get(next(iter(self.cnh)), [])
 
         if veiculo.tipo not in tipos_permitidos:
             raise ValueError("Motorista não pode dirigir este veículo.")
 
+    def atribuir_veiculo(self, veiculo):
+        self._validar_veiculo(veiculo)
         self.veiculo = veiculo
