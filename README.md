@@ -138,7 +138,9 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
 - **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
 
-### 5. Refatorações Implementadas (Diego Victor)
+### 5. Refatorações Implementadas 
+
+(Diego Victor)
 
 Foram realizadas duas refatorações  no código de produção para alinhar o sistema às novas regras de negócio e garantir um código mais limpo:
 
