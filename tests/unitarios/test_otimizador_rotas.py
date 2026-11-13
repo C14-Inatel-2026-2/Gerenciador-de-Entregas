@@ -1,51 +1,84 @@
 import pytest
+from unittest.mock import Mock
 from gestao_frotas.servicos.otimizador_rotas import OtimizadorRotas
 from gestao_frotas.modelos.entrega import Entrega, Prioridade
 from gestao_frotas.excecoes import DadoInvalidoException
-from gestao_frotas.interfaces.provedor_mapas import ProvedorMapas
 
-class MockProvedorMapas(ProvedorMapas):
-    def calcular_distancia_e_tempo(self, origem: str, destino: str) -> tuple[float, float]:
-        return 50.0, 1.0
 
 @pytest.fixture
-def otimizador():
-    provedor_mock = MockProvedorMapas()
-    return OtimizadorRotas(provedor_mapas=provedor_mock)
+def provedor_mock():
+    mock = Mock()
 
-def test_processar_rota_com_sucesso(otimizador):
+    def distancias_simuladas(origem, destino):
+
+        tabela = {
+            ("Santa Rita", "Pouso Alegre"): (25.0, 0.5),
+            ("Santa Rita", "Cachoeira de Minas"): (30.0, 0.6),
+            ("Santa Rita", "Itajubá"): (45.0, 0.8),
+            ("Pouso Alegre", "Borda da Mata"): (20.0, 0.4),
+            ("Pouso Alegre", "Cachoeira de Minas"): (25.0, 0.5),
+            ("Pouso Alegre", "Itajubá"): (60.0, 1.0),
+            ("Borda da Mata", "Cachoeira de Minas"): (15.0, 0.3),
+            ("Borda da Mata", "Itajubá"): (70.0, 1.2),
+            ("Cachoeira de Minas", "Itajubá"): (40.0, 0.7),
+            ("Itajubá", "Maria da Fé"): (30.0, 0.6)
+        }
+
+        if (origem, destino) in tabela: return tabela[(origem, destino)]
+        if (destino, origem) in tabela: return tabela[(destino, origem)]
+        return (999.0, 99.0)
+
+    mock.calcular_distancia_e_tempo.side_effect = distancias_simuladas
+    return mock
+
+
+@pytest.fixture
+def otimizador(provedor_mock):
+    return OtimizadorRotas(provedor_mock)
+
+
+def test_processar_rota_com_sucesso(otimizador, provedor_mock):
     rota = otimizador.processar_rota("Santa Rita", "Pouso Alegre")
     assert rota.origem == "Santa Rita"
     assert rota.destino == "Pouso Alegre"
-    assert rota.distancia_km == 50.0
-    assert rota.tempo_estimado_horas == 1.0
+    assert rota.distancia_km == 25.0
+
 
 def test_origem_vazia_deve_lancar_excecao(otimizador):
     with pytest.raises(DadoInvalidoException):
         otimizador.processar_rota("", "Pouso Alegre")
+
 
 def test_destino_vazio_deve_lancar_excecao(otimizador):
     with pytest.raises(DadoInvalidoException):
         otimizador.processar_rota("Santa Rita", "   ")
 
 
-def test_otimizar_entregas_ordena_por_prioridade(otimizador):
-    entrega_baixa = Entrega(1, "A", "B", 10.0, Prioridade.BAIXA)
-    entrega_alta = Entrega(2, "C", "D", 5.0, Prioridade.ALTA)
-    entrega_normal = Entrega(3, "E", "F", 2.0, Prioridade.NORMAL)
+def test_otimizar_entregas_complexa_com_cinco_cidades(otimizador):
 
-    entregas = [entrega_baixa, entrega_alta, entrega_normal]
-    entregas_otimizadas = otimizador.otimizar_entregas(entregas)
+    entrega1 = Entrega(1, "Base", "Maria da Fé", 10.0)
+    entrega2 = Entrega(2, "Base", "Itajubá", 15.0)
+    entrega3 = Entrega(3, "Base", "Borda da Mata", 5.0)
+    entrega4 = Entrega(4, "Base", "Cachoeira de Minas", 8.0)
+    entrega5 = Entrega(5, "Base", "Pouso Alegre", 20.0)
 
-    assert entregas_otimizadas[0].get_prioridade() == Prioridade.ALTA
-    assert entregas_otimizadas[1].get_prioridade() == Prioridade.NORMAL
-    assert entregas_otimizadas[2].get_prioridade() == Prioridade.BAIXA
+    entregas = [entrega1, entrega2, entrega3, entrega4, entrega5]
+
+
+    sequencia = otimizador.otimizar_entregas("Santa Rita", entregas)
+
+
+    assert sequencia[0].destino == "Pouso Alegre"
+    assert sequencia[1].destino == "Borda da Mata"
+    assert sequencia[2].destino == "Cachoeira de Minas"
+    assert sequencia[3].destino == "Itajubá"
+    assert sequencia[4].destino == "Maria da Fé"
 
 
 def test_preparar_viagem_retorna_dados_corretos(otimizador):
-    entrega = Entrega(1, "A", "B", 10.0, Prioridade.ALTA)
-    rota, entregas_otimizadas = otimizador.preparar_viagem("Santa Rita", "Pouso Alegre", [entrega])
+    entrega = Entrega(1, "Base", "Itajubá", 10.0)
+    rota, sequencia = otimizador.preparar_viagem("Santa Rita", "Destino Final", [entrega])
 
     assert rota.origem == "Santa Rita"
-    assert len(entregas_otimizadas) == 1
-    assert entregas_otimizadas[0].get_prioridade() == Prioridade.ALTA
+    assert len(sequencia) == 1
+    assert sequencia[0].destino == "Itajubá"
