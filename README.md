@@ -165,3 +165,15 @@ Foram realizadas duas refatorações  no código de produção para alinhar o si
 - **Refactoring aplicado:** Extração da validação para o método `_validar_veiculo()`.
 - **Justificativa:** Separar as responsabilidades, melhorar a organização do código e facilitar a manutenção e os testes.
 - **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
+
+- (Leonardo Vieira)
+
+Fiz duas refatorações na minha parte (cálculo do custo), mantendo os testes e o pipeline passando.
+
+**1. Tirei o cálculo do custo total de dentro da tela e levei pro serviço.**
+Antes a soma do custo total (combustível + custo por distância) estava sendo feita no `frontend.py`, ou seja, regra de negócio no meio da interface. Criei o método `calcular_custo_total` dentro do `CalculadorCusto` e deixei a tela só chamando ele. Assim a regra fica onde deve ficar e deu pra testar isso isolado (criei o `test_calcular_custo_total_usando_mock`).
+
+**2. Troquei números soltos por constantes com nome.**
+A tela de custo tinha uns números jogados no código sem explicação nenhuma (os "magic numbers"). Coloquei eles como constantes no topo do `frontend.py` (`TEMPO_ROTA_PADRAO_HORAS`, `CAPACIDADE_PADRAO_KG`, `UF_PADRAO`) e usei elas no lugar. Ficou bem mais claro o que cada valor significa.
+
+PR das duas: https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/24
