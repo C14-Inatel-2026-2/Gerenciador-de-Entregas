@@ -11,6 +11,11 @@ from gestao_frotas.excecoes import DadoInvalidoException
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
+# valores padrao usados na tela de custo (nao afetam o calculo do custo em si)
+TEMPO_ROTA_PADRAO_HORAS = 1.0
+CAPACIDADE_PADRAO_KG = 9999
+UF_PADRAO = "MG"
+
 
 class ProvedorPrecoFixo(ProvedorCombustivel):
     def __init__(self, preco):
@@ -161,18 +166,18 @@ class App(ctk.CTk):
             messagebox.showerror("Erro", "Preencha todos os campos com números válidos.")
             return
 
-        rota = Rota("Origem", "Destino", distancia, 1.0)
-        veiculo = Veiculo(1, "", "", 9999, consumo, custo_km, "")
+        rota = Rota("Origem", "Destino", distancia, TEMPO_ROTA_PADRAO_HORAS)
+        veiculo = Veiculo(1, "", "", CAPACIDADE_PADRAO_KG, consumo, custo_km, "")
         calculador = CalculadorCusto(ProvedorPrecoFixo(preco_litro))
 
         try:
-            custo_combustivel = calculador.calcular_custo_combustivel(rota, veiculo, "MG")
+            custo_combustivel = calculador.calcular_custo_combustivel(rota, veiculo, UF_PADRAO)
             custo_distancia = calculador.custo_por_distancia(rota, veiculo)
         except DadoInvalidoException as erro:
             messagebox.showerror("Erro", str(erro))
             return
 
-        total = custo_combustivel + custo_distancia
+        total = calculador.calcular_custo_total(rota, veiculo, UF_PADRAO)
         messagebox.showinfo(
             "Custo da Viagem",
             f"Combustível: R$ {custo_combustivel:.2f}\n"
