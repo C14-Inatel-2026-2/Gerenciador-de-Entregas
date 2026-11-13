@@ -6,12 +6,13 @@ import customtkinter as ctk
 import tkintermapview
 from tkinter import messagebox
 
-from gestao_frotas.modelos import motorista
 from gestao_frotas.modelos.entrega import Prioridade, Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.veiculo import Veiculo
+from gestao_frotas.modelos.viagem import Viagem
+from gestao_frotas.servicos.gerenciador_viagens import GerenciadorViagens
 from gestao_frotas.servicos.calculador_custo import CalculadorCusto
 from gestao_frotas.interfaces.provedor_combustivel import ProvedorCombustivel
 from gestao_frotas.excecoes import DadoInvalidoException
@@ -23,7 +24,7 @@ ctk.set_default_color_theme("blue")
 TEMPO_ROTA_PADRAO_HORAS = 1.0
 CAPACIDADE_PADRAO_KG = 9999
 UF_PADRAO = "MG"
-
+gerenciador_viagens = GerenciadorViagens()
 
 class ProvedorPrecoFixo(ProvedorCombustivel):
     def __init__(self, preco):
@@ -44,7 +45,11 @@ class App(ctk.CTk):
 
         self.historico_entregas = []
         self.motoristas: list[Motorista] = []
-        self.mostrar_tela_inicial()
+        self.viagens: list[Viagem] = []
+        self.mostrar_tela_login()
+
+        motorista = Motorista(1, "abc", "1234")
+        self.motoristas.append(motorista)
 
     def limpar_janela(self):
         for widget in self.winfo_children():
@@ -73,7 +78,7 @@ class App(ctk.CTk):
         self.label_erro = ctk.CTkLabel(
             frame_central,
             text="",
-            text_color="#ff4d4d",  # Vermelho elegante para alertas
+            text_color="#ff4d4d",
             font=ctk.CTkFont(size=12, weight="bold")
         )
         self.label_erro.pack(pady=(0, 3))
@@ -91,9 +96,6 @@ class App(ctk.CTk):
             messagebox.showerror("Erro", "Por favor, preencha todos os campos")
             return
 
-        motorista = Motorista(1, "abc", "1234")
-        self.motoristas.append(motorista)
-
         if self.input_user.get().strip() == "admin" and self.input_senha.get().strip() == "admin":
             self.mostrar_tela_inicial()
             return
@@ -102,9 +104,10 @@ class App(ctk.CTk):
         for mot in self.motoristas:
             if mot.nome == self.input_user.get() and mot.cnh == self.input_senha.get():
                 login_sucesso = True
+                motorista = mot
         if login_sucesso:
             self.label_erro.configure(text="")
-            self.mostrar_tela_entregas()
+            self.mostrar_tela_entregas(motorista)
         else:
             self.label_erro.configure(text="Usuário ou senha incorretos. Tente novamente.")
 
@@ -678,6 +681,7 @@ class App(ctk.CTk):
         if not nomes_entregas:
             nomes_entregas = ["Nenhuma entrega cadastrada"]
 
+        self.inputs_entregas = []
         for _ in range(5):
             self.input_entrega = ctk.CTkOptionMenu(
                 frame,
@@ -693,13 +697,15 @@ class App(ctk.CTk):
             else:
                 self.input_entrega.set("Nenhuma entrega cadastrada")
 
+            self.inputs_entregas.append(self.input_entrega)
+
         frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
         frame_botoes.pack(pady=(35, 0))
 
         ctk.CTkButton(
             frame_botoes,
             text="Salvar",
-            command=self.salvar_motorista,
+            command=self.salvar_viagem,
             fg_color="green", hover_color="darkgreen",
             font=ctk.CTkFont(weight="bold"),
             height=40, corner_radius=8, width=100
@@ -714,6 +720,197 @@ class App(ctk.CTk):
             text_color=("gray10", "gray90"),
             height=40, width=100, corner_radius=8
         ).pack(side="right", padx=10)
+
+    def salvar_viagem(self):
+        motorista = self.input_motorista.get().strip()
+        if not motorista or motorista == "Nenhum motorista cadastrado":
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos")
+            return
+
+        for m in self.motoristas:
+            if m.nome == motorista:
+                mot = m
+
+        entregas = []
+        for e in self.inputs_entregas:
+            texto_opcao = e.get().strip()
+            if "Nenhuma" not in texto_opcao and "Selecione" not in texto_opcao:
+                try:
+                    id_str = texto_opcao.split(":")[0].strip()
+                    id_entrega = int(id_str)
+
+                    for i in self.historico_entregas:
+                        if id_entrega == i.id:
+                            print(f"Adicionando entrega ID: {i.id}")
+                            entregas.append(i)
+                            break
+                except (ValueError, IndexError):
+                    continue
+
+        if not entregas:
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos")
+            return
+
+        veiculo = veiculo = Veiculo(1, "", "", CAPACIDADE_PADRAO_KG, 10, 10, "")
+
+        try:
+            gerenciador_viagens.iniciar_viagem(mot, veiculo, entregas)
+            self.mostrar_tela_inicial()
+        except DadoInvalidoException as erro:
+            messagebox.showerror("Erro", "O motorista está inválido ou a carga é muito pesada para o veículo")
+            return
+
+    def mostrar_tela_entregas(self, motorista: Motorista):
+        self.limpar_janela()
+
+        title = ctk.CTkFrame(self, fg_color="#030A21")
+        title.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.2, anchor="center")
+
+        topo_title = ctk.CTkFrame(title, fg_color="transparent")
+        topo_title.pack(fill="x", padx=20, pady=(15, 5))
+
+        titulo = ctk.CTkLabel(
+            topo_title,
+            text="Gerenciador de Entregas 📦",
+            font=("Arial", 30, "bold"),
+            anchor="w", justify="left"
+        )
+        titulo.pack(side="left")
+
+        btn_logout = ctk.CTkButton(
+            topo_title,
+            text="Sair ⏻",
+            command=self.mostrar_tela_login,
+            fg_color="darkgray",
+            font=("Arial", 10, "bold"),
+            text_color="black",
+            width=40,
+            height=10
+        )
+        btn_logout.pack(side="right")
+
+        linha_divisoria = ctk.CTkFrame(
+            title,
+            height=5,
+            fg_color=("gray50", "gray90")
+        )
+        linha_divisoria.pack(fill="x", pady=(5, 5))
+
+        frame = ctk.CTkFrame(self, fg_color="#051121")
+        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=0.75, anchor="center")
+
+        titulo = ctk.CTkLabel(
+            frame,
+            text=f"Bem vindo, {motorista.nome}!",
+            font=("Arial", 24, "bold"),
+            anchor="w", justify="left"
+        )
+        titulo.pack(fill="x", padx=20, pady=(20, 10))
+
+        btn_listar = ctk.CTkButton(
+            frame,
+            text="Listar Entregas",
+            command=lambda:self.listar_entregas(motorista),
+            font=("Arial", 14),
+            height=40,
+            width=200
+        )
+        btn_listar.pack(anchor="w", padx=20, pady=8)
+
+        btn_rota = ctk.CTkButton(
+            frame,
+            text="Ver Rota",
+            command=self.ver_rota,
+            font=("Arial", 14),
+            height=40,
+            width=200).pack(anchor="w", padx=20, pady=8)
+
+    def listar_entregas(self, motorista: Motorista):
+        self.limpar_janela()
+        viagens = gerenciador_viagens.viagems
+        for v in viagens:
+            if v.motorista.nome == motorista.nome:
+                viagem = v
+
+        frame = ctk.CTkFrame(self, fg_color="#030A21")
+        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=1, anchor="center")
+
+        ctk.CTkLabel(
+            frame,
+            text="Entregas Planejadas",
+            font=("Arial", 26, "bold"),
+            text_color="white"
+        ).pack(pady=(25, 10))
+
+        scroll_frame = ctk.CTkScrollableFrame(
+            frame,
+            width=400,
+            height=300,
+            fg_color="#0b132b",
+            corner_radius=10
+        )
+        scroll_frame.pack(pady=10, fill="both", expand=True, padx=40)
+
+        if not viagem:
+            ctk.CTkLabel(
+                scroll_frame,
+                text="Nenhuma viagem cadastrado.",
+                font=("Arial", 14),
+                text_color="gray"
+            ).pack(pady=20)
+        else:
+            for entrega in viagem.entregas:
+                item_card = ctk.CTkFrame(scroll_frame, fg_color="#1c2541", height=50, corner_radius=8)
+                item_card.pack(fill="x", pady=6, padx=10)
+                lbl_nome = ctk.CTkLabel(
+                    item_card,
+                    text=f"{entrega.id}: {entrega.origem} -> {entrega.destino}",
+                    font=("Arial", 14, "bold"),
+                    text_color="white"
+                )
+                lbl_nome.pack(padx=15, pady=10)
+
+        btn_voltar = ctk.CTkButton(
+            frame,
+            text="Voltar",
+            command=lambda: self.mostrar_tela_entregas(motorista),
+            font=("Arial", 14),
+            height=40,
+            width=200
+        )
+        btn_voltar.pack(pady=(10, 25))
+
+    def ver_rota(self):
+        self.limpar_janela()
+
+        titulo = ctk.CTkLabel(self, text="Mapa da Rota", font=("Arial", 24, "bold"))
+        titulo.pack(pady=10)
+
+        self.input_mapa_origem = ctk.CTkEntry(
+            self, placeholder_text="Endereço de origem", width=300, height=35
+        )
+        self.input_mapa_origem.pack(pady=5)
+
+        self.input_mapa_destino = ctk.CTkEntry(
+            self, placeholder_text="Endereço de destino", width=300, height=35
+        )
+        self.input_mapa_destino.pack(pady=5)
+
+        self.mapa = tkintermapview.TkinterMapView(self, width=540, height=320, corner_radius=8)
+        self.mapa.set_position(-22.25, -45.70)
+        self.mapa.set_zoom(6)
+        self.mapa.pack(pady=10)
+
+        btn_voltar = ctk.CTkButton(
+            self,
+            text="Voltar",
+            command=self.mostrar_tela_inicial,
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            height=40, width=60, corner_radius=8
+        )
+        btn_voltar.pack(pady=5)
 
 
 if __name__ == "__main__":

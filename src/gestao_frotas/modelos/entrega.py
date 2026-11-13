@@ -2,7 +2,6 @@ from enum import Enum
 from gestao_frotas.excecoes import DadoInvalidoException
 
 
-
 class StatusEntrega(Enum):
     PENDENTE = 1
     A_CAMINHO = 2
@@ -48,16 +47,6 @@ class Entrega:
 
     def get_prioridade(self):
         return self.__prioridade
-
-    def __repr__(self) -> str:
-        return (
-            f"Entrega(id={self.__id}, "
-            f"origem='{self.__endereco_origem}', "
-            f"destino='{self.__endereco_destino}', "
-            f"peso={self.__peso}kg, "
-            f"prioridade='{self.__prioridade}', "
-            f"status='{self.__status}')"
-        )
 
     @property
     def id(self) -> int:

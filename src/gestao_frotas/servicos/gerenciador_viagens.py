@@ -13,9 +13,8 @@ class GerenciadorViagens:
     def __init__(self):
         self.__viagens_em_andamento: list[Viagem] = []
 
-    def iniciar_viagem(self, motorista: Motorista, rota: Rota, veiculo: Veiculo, entregas: list[Entrega]):
+    def iniciar_viagem(self, motorista: Motorista, veiculo: Veiculo, entregas: list[Entrega]):
         horario_inicio = datetime.now()
-        horario_termino = horario_inicio + timedelta(hours=rota.tempo_estimado_horas)
 
         peso_total = sum(entrega.peso for entrega in entregas)
 
@@ -29,11 +28,7 @@ class GerenciadorViagens:
                 f'O motorista {motorista.nome} não está disponível para entrega.'
             )
 
-        calculador = CalculadorCusto(None)
-        custo_total = calculador.calcular_custo_combustivel(rota, veiculo, '')
-        custo_total +=  calculador.custo_por_distancia(rota, veiculo)
-
-        viagem = Viagem(motorista, veiculo, entregas, horario_inicio, horario_termino)
+        viagem = Viagem(motorista, veiculo, entregas, horario_inicio)
 
         self.__viagens_em_andamento.append(viagem)
         viagem.atualizar_status(StatusViagem.EM_ANDAMENTO)
