@@ -10,14 +10,13 @@ class OtimizadorRotas:
         self.provedor_mapas = provedor_mapas
 
     def processar_rota(self, origem: str, destino: str) -> Rota:
-        if not origem or not origem.strip():
+        if not origem.strip():
             raise DadoInvalidoException("A origem informada é vazia ou inválida.")
 
-        if not destino or not destino.strip():
+        if not destino.strip():
             raise DadoInvalidoException("O destino informado é vazio ou inválido.")
 
         distancia_km, tempo_estimado_horas = self.provedor_mapas.calcular_distancia_e_tempo(origem, destino)
-
         return Rota(origem, destino, distancia_km, tempo_estimado_horas)
 
     def otimizar_entregas(self, origem_atual: str, entregas: list[Entrega]) -> list[Entrega]:
