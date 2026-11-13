@@ -43,7 +43,7 @@ class App(ctk.CTk):
 
         self.historico_entregas = []
         self.motoristas: list[Motorista] = []
-        self.mostrar_tela_login()
+        self.mostrar_tela_inicial()
 
     def limpar_janela(self):
         for widget in self.winfo_children():
@@ -110,35 +110,106 @@ class App(ctk.CTk):
     def mostrar_tela_inicial(self):
         self.limpar_janela()
 
-        titulo = ctk.CTkLabel(self, text="Controle de Entregas", font=("Arial", 20, "bold"))
-        titulo.pack(pady=40)
+        title = ctk.CTkFrame(self, fg_color="#030A21")
+        title.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.2, anchor="center")
+
+        topo_title = ctk.CTkFrame(title, fg_color="transparent")
+        topo_title.pack(fill="x", padx=20, pady=(15, 5))
+
+        titulo = ctk.CTkLabel(
+            topo_title,
+            text="Gerenciador de Entregas 📦",
+            font=("Arial", 30, "bold"),
+            anchor="w", justify="left"
+        )
+        titulo.pack(side="left")
+
+        btn_logout = ctk.CTkButton(
+            topo_title,
+            text="Sair ⏻",
+            command=self.mostrar_tela_login,
+            fg_color="darkgray",
+            font=("Arial", 10, "bold"),
+            text_color="black",
+            width=40,
+            height=10
+        )
+        btn_logout.pack(side="right")
+
+        linha_divisoria = ctk.CTkFrame(
+            title,
+            height=5,
+            fg_color=("gray50", "gray90")
+        )
+        linha_divisoria.pack(fill="x", pady=(5,5))
+
+        frame = ctk.CTkFrame(self, fg_color="#051121")
+        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=0.75, anchor="center")
+
+        titulo = ctk.CTkLabel(
+            frame,
+            text="Cadastros",
+            font=("Arial", 24, "bold"),
+            anchor="w", justify="left"
+        )
+        titulo.pack(fill="x", padx=20, pady=(20, 10))
 
         btn_cadastrar_entrega = ctk.CTkButton(
-            self,
-            text="Cadastrar Entrega",
+            frame,
+            text="+ Cadastrar Entrega",
             command=self.mostrar_tela_cadastro,
             font=("Arial", 14),
-            height=40
+            height=40,
+            width=200
         )
-        btn_cadastrar_entrega.pack(pady=10)
+        btn_cadastrar_entrega.pack(anchor="w", padx=20, pady=8)
+
+        linha_cadastro = ctk.CTkFrame(frame, height=3, fg_color="gray")
+        linha_cadastro.pack(fill="x", pady=5)
+
+        titulo = ctk.CTkLabel(
+            frame,
+            text="Serviços",
+            font=("Arial", 24, "bold"),
+            anchor="w", justify="left"
+        )
+        titulo.pack(fill="x", padx=20, pady=(20, 10))
 
         btn_calcular_custo = ctk.CTkButton(
-            self,
+            frame,
             text="Calcular Custo da Viagem",
             command=self.mostrar_tela_custo,
             font=("Arial", 14),
-            height=40
+            height=40,
+            width = 200
         )
-        btn_calcular_custo.pack(pady=10)
+        btn_calcular_custo.pack(anchor="w", padx=20, pady=10)
 
         btn_mapa = ctk.CTkButton(
-            self,
+            frame,
             text="Ver Mapa da Rota",
             command=self.mostrar_tela_mapa,
             font=("Arial", 14),
-            height=40
+            height=40,
+            width = 200
         )
-        btn_mapa.pack(pady=10)
+        btn_mapa.pack(anchor="w", padx=20, pady=10)
+
+        footer_frame = ctk.CTkFrame(
+            self,
+            fg_color="#030A21",
+            height=40,
+            corner_radius=0
+        )
+        footer_frame.place(relx=0.5, rely=1.0, relwidth=1.0, anchor="s")
+
+        lbl_footer = ctk.CTkLabel(
+            footer_frame,
+            text="© 2026 Gerenciador de Entregas - Todos os direitos reservados",
+            font=("Arial", 11),
+            text_color=("gray60", "gray50")
+        )
+        lbl_footer.place(relx=0.5, rely=0.5, anchor="center")
 
     def mostrar_tela_cadastro(self):
         self.limpar_janela()
