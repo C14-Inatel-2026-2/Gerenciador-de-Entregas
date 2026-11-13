@@ -44,6 +44,5 @@ class OtimizadorRotas:
 
     def preparar_viagem(self, origem: str, destino: str, entregas: list[Entrega]) -> tuple[Rota, list[Entrega]]:
         rota = self.processar_rota(origem, destino)
-        entregas_otimizadas = self.otimizar_entregas(entregas)
-
+        entregas_otimizadas = self.otimizar_entregas(origem,entregas)
         return rota, entregas_otimizadas
