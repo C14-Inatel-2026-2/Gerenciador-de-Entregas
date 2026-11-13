@@ -6,6 +6,7 @@ import customtkinter as ctk
 import tkintermapview
 from tkinter import messagebox
 
+from gestao_frotas.modelos.entrega import Prioridade
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.rota import Rota
@@ -37,11 +38,12 @@ class App(ctk.CTk):
 
         self.title("Gerenciador de Entregas")
         self.geometry("600x550")
-        self.resizable(True, True)
+        self.resizable(False, False)
+        self.configure(fg_color="#030A21")
 
         self.historico_entregas = []
         self.motoristas: list[Motorista] = []
-        self.mostrar_tela_login()
+        self.mostrar_tela_inicial()
 
     def limpar_janela(self):
         for widget in self.winfo_children():
@@ -50,17 +52,24 @@ class App(ctk.CTk):
     def mostrar_tela_login(self):
         self.limpar_janela()
 
-        titulo = ctk.CTkLabel(self, text="Login", font=("Arial", 20, "bold"))
-        titulo.pack(pady=30)
+        frame_central = ctk.CTkFrame(self, fg_color="transparent")
+        frame_central.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.input_user = ctk.CTkEntry(self, placeholder_text="User", width=280, height=35)
+        titulo = ctk.CTkLabel(
+            frame_central,
+            text="Login",
+            font=("Helvetica", 24, "bold")
+        )
+        titulo.pack(pady=(0, 10))
+
+        self.input_user = ctk.CTkEntry(frame_central, placeholder_text="User", width=280, height=35)
         self.input_user.pack(pady=8)
 
-        self.input_senha = ctk.CTkEntry(self, placeholder_text="Senha", width=280, height=35)
+        self.input_senha = ctk.CTkEntry(frame_central, placeholder_text="Senha", width=280, height=35)
         self.input_senha.pack(pady=8)
 
         btn_confirmar = ctk.CTkButton (
-            self,
+            frame_central,
             text="Confirmar",
             command=self.confirmar_login,
             font=("Arial", 14),
@@ -118,51 +127,84 @@ class App(ctk.CTk):
     def mostrar_tela_cadastro(self):
         self.limpar_janela()
 
-        titulo = ctk.CTkLabel(self, text="Nova Entrega", font=("Arial", 16, "bold"))
+        frame = ctk.CTkFrame(self, corner_radius=16, fg_color=("black", "#051121"), border_color="grey", border_width=1)
+        frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.85)
 
-        self.input_codigo = ctk.CTkEntry(self, placeholder_text="Código da Entrega", width=280, height=35)
-        self.input_codigo.pack(pady=8)
+        titulo = ctk.CTkLabel(frame, text="Informações da Entrega 📦", font=ctk.CTkFont(size=25, weight="bold"))
+        titulo.pack(pady=25)
 
-        self.input_origem = ctk.CTkEntry(self, placeholder_text="Endereço de Origem", width=280, height=35)
-        self.input_origem.pack(pady=8)
+        self.input_codigo = ctk.CTkEntry(
+            frame, placeholder_text="Código da Entrega",
+            width=320, height=40, corner_radius=8)
+        self.input_codigo.pack(pady=10)
 
-        self.input_destino = ctk.CTkEntry(self, placeholder_text="Endereço de Destino", width=280, height=35)
-        self.input_destino.pack(pady=8)
+        self.input_origem = ctk.CTkEntry(
+            frame, placeholder_text="Endereço de Origem",
+            width=320, height=40, corner_radius=8)
+        self.input_origem.pack(pady=10)
 
-        self.input_peso = ctk.CTkEntry(self, placeholder_text="Peso da Entrega (Kg)", width=280, height=35)
-        self.input_peso.pack(pady=8)
+        self.input_destino = ctk.CTkEntry(
+            frame, placeholder_text="Endereço de Destino",
+            width=320, height=40, corner_radius=8)
+        self.input_destino.pack(pady=10)
+
+        frame_2 = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_2.pack(pady=(20, 0))
+
+        self.input_prioridade = ctk.CTkOptionMenu(
+            frame_2,
+            values = ["Baixa", "Normal", "Alta"],
+            width=20, height=40, corner_radius=8,
+        )
+
+        self.input_prioridade.pack(side="left", padx=10)
+
+        self.input_peso = ctk.CTkEntry(
+            frame_2, placeholder_text="Peso da Entrega (Kg)",
+            width=135, height=40)
+        self.input_peso.pack(side="right", padx=10)
+
+        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_botoes.pack(pady=(35, 0))
 
         btn_salvar = ctk.CTkButton(
-            self,
-            text="Salvar e Cadastrar Entrega",
+            frame_botoes,
+            text="Salvar e Cadastrar",
             command=self.salvar_dados,
-            fg_color="green",
-            hover_color="darkgreen",
-            height=35
+            fg_color="green", hover_color="darkgreen",
+            font=ctk.CTkFont(weight="bold"),
+            height=40, corner_radius=8, width=150
         )
-        btn_salvar.pack(pady=12)
+        btn_salvar.pack(side="left", padx=10)
 
         btn_voltar = ctk.CTkButton(
-            self,
+            frame_botoes,
             text="Voltar",
             command=self.mostrar_tela_inicial,
-            fg_color="gray",
-            hover_color="darkgray",
-            height=30
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            height=40, width=100, corner_radius=8,
         )
-        btn_voltar.pack(pady=12)
+        btn_voltar.pack(side="right", padx=10)
 
     def salvar_dados(self):
         destino = self.input_destino.get().strip()
         origem = self.input_origem.get().strip()
         id = self.input_codigo.get().strip()
-        peso = int(self.input_peso.get().strip())
+        peso = self.input_peso.get().strip()
+        if self.input_prioridade.get().strip() == "Normal":
+            prioridade = Prioridade.NORMAL
+        elif self.input_prioridade.get().strip() == "Alta":
+            prioridade = Prioridade.ALTA
+        elif self.input_prioridade.get().strip() == "Baixa":
+            prioridade = Prioridade.BAIXA
 
-        if not destino or not origem or not id or not peso:
+        if not destino or not origem or not id or not peso or not prioridade:
             messagebox.showerror("Erro", "Por favor, preencha todos os campos")
             return
 
-        nova_entrega = Entrega(id, origem, destino, peso)
+        nova_entrega = Entrega(int(id), origem, destino, int(peso), prioridade)
         self.historico_entregas.append(nova_entrega)
 
         messagebox.showinfo("Sucesso", "Entrega Cadastrada com sucesso!")
