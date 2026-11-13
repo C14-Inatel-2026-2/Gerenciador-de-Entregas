@@ -1,3 +1,4 @@
+
 import json
 import math
 import urllib.request
@@ -9,6 +10,7 @@ from tkinter import messagebox
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.veiculo import Veiculo
+from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.servicos.calculador_custo import CalculadorCusto
 from gestao_frotas.interfaces.provedor_combustivel import ProvedorCombustivel
 from gestao_frotas.excecoes import DadoInvalidoException
@@ -39,6 +41,7 @@ class App(ctk.CTk):
         self.resizable(True, True)
 
         self.historico_entregas = []
+        self.motoristas = []
         self.mostrar_tela_inicial()
 
     def limpar_janela(self):
@@ -78,10 +81,14 @@ class App(ctk.CTk):
         )
         btn_mapa.pack(pady=10)
 
+        ctk.CTkButton(self, text="Cadastrar Motorista", command=self.mostrar_tela_cadastro_motorista).pack(pady=10)
+        ctk.CTkButton(self, text="Listar Motoristas", command=self.mostrar_tela_motoristas).pack(pady=10)
+
     def mostrar_tela_cadastro(self):
         self.limpar_janela()
 
         titulo = ctk.CTkLabel(self, text="Nova Entrega", font=("Arial", 16, "bold"))
+        titulo.pack(pady=10)
 
         self.input_codigo = ctk.CTkEntry(self, placeholder_text="Código da Entrega", width=280, height=35)
         self.input_codigo.pack(pady=8)
@@ -131,6 +138,37 @@ class App(ctk.CTk):
         messagebox.showinfo("Sucesso", "Entrega Cadastrada com sucesso!")
         print(nova_entrega)
         self.mostrar_tela_inicial()
+
+    def mostrar_tela_cadastro_motorista(self):
+        self.limpar_janela()
+        ctk.CTkLabel(self, text="Cadastrar Motorista").pack(pady=20)
+        self.input_nome = ctk.CTkEntry(self, placeholder_text="Nome")
+        self.input_nome.pack(pady=10)
+        self.input_cnh = ctk.CTkEntry(self, placeholder_text="CNH")
+        self.input_cnh.pack(pady=10)
+        ctk.CTkButton(self, text="Salvar", command=self.salvar_motorista).pack(pady=10)
+        ctk.CTkButton(self, text="Voltar", command=self.mostrar_tela_inicial).pack(pady=10)
+
+    def salvar_motorista(self):
+        nome = self.input_nome.get().strip()
+        cnh = self.input_cnh.get().strip()
+        if not nome or not cnh:
+            messagebox.showerror("Erro", "Preencha nome e CNH.")
+            return
+        motorista = Motorista(len(self.motoristas) + 1, nome, {cnh: []})
+        self.motoristas.append(motorista)
+        messagebox.showinfo("Sucesso", "Motorista cadastrado!")
+        self.mostrar_tela_inicial()
+
+    def mostrar_tela_motoristas(self):
+        self.limpar_janela()
+        ctk.CTkLabel(self, text="Motoristas Cadastrados").pack(pady=20)
+        if not self.motoristas:
+            ctk.CTkLabel(self, text="Nenhum motorista cadastrado.").pack(pady=10)
+        else:
+            for motorista in self.motoristas:
+                ctk.CTkLabel(self, text=f"{motorista.nome} - {motorista.status}").pack(pady=8)
+        ctk.CTkButton(self, text="Voltar", command=self.mostrar_tela_inicial).pack(pady=15)
 
     def mostrar_tela_custo(self):
         self.limpar_janela()
