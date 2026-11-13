@@ -138,7 +138,7 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
 - **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
 
-### 5. Refatorações Implementadas 
+### 5) Refatorações Implementadas 
 
 (Diego Victor)
 
@@ -151,3 +151,17 @@ Foram realizadas duas refatorações  no código de produção para alinhar o si
 2. **Simplificação da Validação de Parâmetros (método `processar_rota`):**
    - **O que foi feito:** Remoção da checagem dupla/redundante de valores nulos (`if not origem or not origem.strip()`), mantendo apenas a validação de strings vazias com `if not origem.strip()`.
    - **Por que foi feito:** Alinhamento técnico com a equipe. Concluiu-se formalmente que o sistema não vai permitir o cadastro sem colocar todas as informações Como essa trava já garante que nunca chegará uma string nula na requisição, a dupla checagem tornou-se uma "programação defensiva" redundante, e a sua remoção deixou o código mais limpo e direto.
+
+(Gabriel)
+
+### Refactoring 1 — Extract Method: Validação de Status do Motorista
+- **Code Smell:** Código duplicado na validação do status do motorista, realizada tanto no construtor quanto no método `atualizar_status`.
+- **Refactoring aplicado:** Extração da validação para o método `_validar_status()`.
+- **Justificativa:** Centralizar a regra de validação, evitar duplicação de código e facilitar futuras manutenções.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
+
+### Refactoring 2 — Extract Method: Validação de Veículo do Motorista
+- **Code Smell:** O método `atribuir_veiculo()` acumulava duas responsabilidades: validar se o motorista pode dirigir o veículo e realizar sua atribuição.
+- **Refactoring aplicado:** Extração da validação para o método `_validar_veiculo()`.
+- **Justificativa:** Separar as responsabilidades, melhorar a organização do código e facilitar a manutenção e os testes.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
