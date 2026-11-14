@@ -74,15 +74,6 @@ def test_otimizar_entregas_complexa_com_cinco_cidades(otimizador):
     assert sequencia[3].destino == "Itajubá"
     assert sequencia[4].destino == "Maria da Fé"
 
-
-def test_preparar_viagem_retorna_dados_corretos(otimizador):
-    entrega = Entrega(1, "Base", "Itajubá", 10.0)
-    rota, sequencia = otimizador.preparar_viagem("Santa Rita", "Destino Final", [entrega])
-
-    assert rota.origem == "Santa Rita"
-    assert len(sequencia) == 1
-    assert sequencia[0].destino == "Itajubá"
-
 def test_otimizar_entregas_insere_deslocamento_quando_ha_salto(otimizador):
     entrega1 = Entrega(1, "Santa Rita", "Pouso Alegre", 10.0)
     entrega2 = Entrega(2, "Itajubá", "Maria da Fé", 15.0)

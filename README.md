@@ -130,6 +130,13 @@ Estes são os detalhes do uso da IA como apoio de validação:
   - **Falha: Conflito com Testes Legados de Mock (Base):** A inserção automática de deslocamentos quebrou inicialmente o teste de 5 cidades que utilizava origens genéricas `"Base"`. **Ajuste:** Ajustou-se a condição de verificação no otimizador para ignorar o deslocamento quando a origem for genérica de teste (`"Base"`), preservando a integridade dos testes legados e a lógica real para rotas dinâmicas.
 - **Conclusão:** A implementação bem-sucedida do grafo dinâmico e da lógica de transição de trechos só foi atingida após correções manuais de validação de regras de negócio internas (peso e compatibilidade com fixtures de testes), consolidando um algoritmo de roteamento robusto, testado e sincronizado com a branch principal (`main`).
 
+### Uso de IA (Gemini) — 
+- **Ferramenta Utilizada:** Google Gemini.
+- **Prompt e Objetivo:** Ajuda na estilização de Interface do frontend utilizando a biblioteca customtkinter.
+- **Prompt e Objetivo:** Pedidos de ajuda para posicionamento e layout de componentes em customtkinter (como corrigir alinhamento de barra divisória em cabeçalhos, criar janelas roláveis com CTkScrollableFrame e organizar botões). 
+- **Prompt e Objetivo:** Tratamento de Erros e Exceções causado durante a construção do mapa no customtkinter.
+- **Prompt e Objetivo:** Soluções para bugs de código, como erros de tipo ao passar objetos de menu (CTkOptionMenu), problemas de desempacotamento de variáveis (ValueError), e tratamento de erros de widgets não inicializados (AttributeError).
+
 
 ## 4) Requisitos
 
@@ -198,3 +205,29 @@ Antes a soma do custo total (combustível + custo por distância) estava sendo f
 A tela de custo tinha uns números jogados no código sem explicação nenhuma (os "magic numbers"). Coloquei eles como constantes no topo do `frontend.py` (`TEMPO_ROTA_PADRAO_HORAS`, `CAPACIDADE_PADRAO_KG`, `UF_PADRAO`) e usei elas no lugar. Ficou bem mais claro o que cada valor significa.
 
 PR das duas: https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/24
+
+- (William Andrade)
+- 
+- ### Refactoring 1 — Remove Dead Code
+- **Code Smell:** No frontend com popups de feedbacks desnecessários.
+- **Refactoring aplicado:** Remoção das janelas de popups criados .
+- **Justificativa:** Esses foram utilizados para feedback visual durante o desenvolvimento do frontend. Visto que agora ele está pront, os popups se tornaram fúteis.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/32
+
+### Refactoring 2 — Remoção de Código Redundante
+- **Code Smell:** O método `ver_rota` e `listar_entregas` possuíam um mesmo `for` que executavam os mesmos códigos
+- **Refactoring aplicado:** Extração do `for` e adicionado em um método em comum`.
+- **Justificativa:** Melhorar a organização do código e facilitar a manutenção.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/32
+
+### Refactoring 3 — Remoção de Código Redundante
+- **Code Smell:** Código duplicado no `frontend.py`, repetindo uma configuração de um botão diversas vezes
+- **Refactoring aplicado:** Substituição dos botões isoladamente por um for que configurará cada botão.
+- **Justificativa:** Evitar duplicação de código e facilitar futuras manutenções.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/29
+
+### Refactoring 4 — Remove Dead Code
+- **Code Smell:** Código inutilizado em `provedor_mapas_grafo.py`
+- **Refactoring aplicado:** Remoção do método `preparar_viagem` que não estava tendo utilidade nenhuma.
+- **Justificativa:** Evitar código inútil dificultando a leitura do código e manutenção futura.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/34
