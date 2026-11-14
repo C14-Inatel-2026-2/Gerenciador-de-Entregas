@@ -231,3 +231,6 @@ PR das duas: https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/2
 - **Refactoring aplicado:** Remoção do método `preparar_viagem` que não estava tendo utilidade nenhuma.
 - **Justificativa:** Evitar código inútil dificultando a leitura do código e manutenção futura.
 - **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/34
+
+## 6) URL do Render
+- https://dashboard.render.com/project/prj-db9dhvijnfac73bsqagg
