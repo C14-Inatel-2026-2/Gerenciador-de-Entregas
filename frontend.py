@@ -781,6 +781,12 @@ class App(ctk.CTk):
     def mostrar_tela_entregas(self, motorista: Motorista):
         self.limpar_janela()
 
+        viagens = gerenciador_viagens.viagems
+        viagem = None
+        for v in viagens:
+            if v.motorista.nome == motorista.nome:
+                viagem = v
+
         title = ctk.CTkFrame(self, fg_color="#030A21")
         title.place(relx=0.5, rely=0.1, relwidth=1, relheight=0.2, anchor="center")
 
@@ -828,7 +834,7 @@ class App(ctk.CTk):
         btn_listar = ctk.CTkButton(
             frame,
             text="Listar Entregas",
-            command=lambda: self.listar_entregas(motorista),
+            command=lambda: self.listar_entregas(motorista, viagem),
             font=("Arial", 14),
             height=40,
             width=200
@@ -838,19 +844,14 @@ class App(ctk.CTk):
         btn_rota = ctk.CTkButton(
             frame,
             text="Ver Rota",
-            command=lambda: self.ver_rota(motorista),
+            command=lambda: self.ver_rota(motorista, viagem),
             font=("Arial", 14),
             height=40,
             width=200)
         btn_rota.pack(padx=20, pady=8)
 
-    def listar_entregas(self, motorista: Motorista):
+    def listar_entregas(self, motorista: Motorista, viagem: Viagem):
         self.limpar_janela()
-        viagens = gerenciador_viagens.viagems
-        viagem = None
-        for v in viagens:
-            if v.motorista.nome == motorista.nome:
-                viagem = v
 
         frame = ctk.CTkFrame(self, fg_color="#030A21")
         frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=1, anchor="center")
@@ -900,14 +901,8 @@ class App(ctk.CTk):
         )
         btn_voltar.pack(pady=(10, 25))
 
-    def ver_rota(self, motorista: Motorista):
+    def ver_rota(self, motorista: Motorista, viagem: Viagem):
         self.limpar_janela()
-
-        viagens = gerenciador_viagens.viagems
-        viagem = None
-        for v in viagens:
-            if v.motorista.nome == motorista.nome:
-                viagem = v
 
         if not viagem:
             messagebox.showerror("Aviso", "Você não possui nenhuma entrega a pendente no momento")
@@ -946,7 +941,7 @@ class App(ctk.CTk):
         btn_salvar = ctk.CTkButton(
             frame_botoes,
             text="Finalizar Entrega",
-            command=finalizar_entrega,
+            command=self.finalizar_entrega,
             fg_color="green", hover_color="darkgreen",
             font=ctk.CTkFont(weight="bold"),
             height=40, corner_radius=8, width=150
