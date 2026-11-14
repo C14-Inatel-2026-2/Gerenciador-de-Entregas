@@ -904,7 +904,7 @@ class App(ctk.CTk):
     def ver_rota(self, motorista: Motorista, viagem: Viagem):
         self.limpar_janela()
 
-        if not viagem.entregas:
+        if not viagem or not viagem.entregas:
             messagebox.showerror("Aviso", "Você não possui nenhuma entrega a pendente no momento")
             self.mostrar_tela_entregas(motorista)
             return
