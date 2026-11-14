@@ -6,6 +6,7 @@ import customtkinter as ctk
 import tkintermapview
 from tkinter import messagebox
 
+from gestao_frotas.servicos.provedor_mapas_grafo import ProvedorMapasGrafo
 from gestao_frotas.modelos.entrega import Prioridade, Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.rota import Rota
@@ -15,16 +16,18 @@ from gestao_frotas.servicos.gerenciador_viagens import GerenciadorViagens
 from gestao_frotas.servicos.calculador_custo import CalculadorCusto
 from gestao_frotas.interfaces.provedor_combustivel import ProvedorCombustivel
 from gestao_frotas.excecoes import DadoInvalidoException
+from gestao_frotas.servicos.otimizador_rotas import OtimizadorRotas
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
-
 TEMPO_ROTA_PADRAO_HORAS = 1.0
 CAPACIDADE_PADRAO_KG = 9999
 UF_PADRAO = "MG"
-gerenciador_viagens = GerenciadorViagens()
 
+gerenciador_viagens = GerenciadorViagens()
+provedor = ProvedorMapasGrafo()
+otimizador = OtimizadorRotas(provedor)
 
 class ProvedorPrecoFixo(ProvedorCombustivel):
     def __init__(self, preco):
@@ -42,14 +45,19 @@ class App(ctk.CTk):
         self.geometry("600x550")
         self.resizable(False, False)
         self.configure(fg_color="#030A21")
+        self.mapa_origem = ""
+        self.mapa_destino = ""
 
-        self.historico_entregas = []
         self.motoristas: list[Motorista] = []
         self.viagens: list[Viagem] = []
-        self.mostrar_tela_login()
+        self.historico_entregas: list[Entrega] = []
 
-        motorista = Motorista(1, "abc", "1234")
+        motorista = Motorista(1, "teste", "1234")
+        entrega = Entrega(0, "Santa Rita do Sapucaí", "Pouso Alegre", 5)
         self.motoristas.append(motorista)
+        self.historico_entregas.append(entrega)
+
+        self.mostrar_tela_login()
 
     def limpar_janela(self):
         for widget in self.winfo_children():
@@ -547,6 +555,7 @@ class App(ctk.CTk):
         )
         self.input_mapa_destino.pack(pady=5)
 
+
         btn_rota = ctk.CTkButton(
             self,
             text="Ver Rota",
@@ -575,12 +584,21 @@ class App(ctk.CTk):
         btn_voltar.pack(pady=5)
 
     def ver_rota_no_mapa(self):
-        origem = self.input_mapa_origem.get().strip()
-        destino = self.input_mapa_destino.get().strip()
+        try:
+            origem = self.input_mapa_origem.get().strip()
+            destino = self.input_mapa_destino.get().strip()
 
-        if not origem or not destino:
-            messagebox.showerror("Erro", "Preencha a origem e o destino.")
-            return
+            if not origem or not destino:
+                messagebox.showerror("Erro", "Preencha a origem e o destino.")
+                return
+
+        except Exception:
+            origem = self.mapa_origem
+            destino = self.mapa_destino
+
+            if not self.mapa_origem or not self.mapa_destino:
+                messagebox.showerror("Erro", "Mapa não conseguiu ser carregado.")
+                return
 
         self.mapa.delete_all_marker()
         self.mapa.delete_all_path()
@@ -674,7 +692,9 @@ class App(ctk.CTk):
 
         titulo = ctk.CTkLabel(frame, text="Entregas", font=ctk.CTkFont(size=14, weight="bold"))
         titulo.pack(pady=8)
-        nomes_entregas = [(str(entrega.id) + ": " + str(entrega.destino)) for entrega in self.historico_entregas]
+        nomes_entregas = [(str(entrega.id) + ": " + str(entrega.origem) + " -> " +
+                           str(entrega.destino)) for entrega in self.historico_entregas]
+
         if not nomes_entregas:
             nomes_entregas = ["Nenhuma entrega cadastrada"]
 
@@ -813,16 +833,16 @@ class App(ctk.CTk):
             height=40,
             width=200
         )
-        btn_listar.pack(anchor="w", padx=20, pady=8)
+        btn_listar.pack(padx=20, pady=20)
 
         btn_rota = ctk.CTkButton(
             frame,
             text="Ver Rota",
-            command=self.ver_rota,
+            command=lambda: self.ver_rota(motorista),
             font=("Arial", 14),
             height=40,
             width=200)
-        btn_rota.pack(anchor="w", padx=20, pady=8)
+        btn_rota.pack(padx=20, pady=8)
 
     def listar_entregas(self, motorista: Motorista):
         self.limpar_janela()
@@ -880,29 +900,61 @@ class App(ctk.CTk):
         )
         btn_voltar.pack(pady=(10, 25))
 
-    def ver_rota(self):
+    def ver_rota(self, motorista: Motorista):
         self.limpar_janela()
+
+        viagens = gerenciador_viagens.viagems
+        viagem = None
+        for v in viagens:
+            if v.motorista.nome == motorista.nome:
+                viagem = v
+
+        if not viagem:
+            messagebox.showerror("Aviso", "Você não possui nenhuma entrega a pendente no momento")
+            self.mostrar_tela_entregas(motorista)
+            return
+
+        self.entregas_otimizadas = otimizador.otimizar_entregas("Santa Rita do Sapucaí", viagem.entregas)
 
         titulo = ctk.CTkLabel(self, text="Mapa da Rota", font=("Arial", 24, "bold"))
         titulo.pack(pady=10)
 
-        self.input_mapa_origem = ctk.CTkEntry(
-            self, placeholder_text="Endereço de origem", width=300, height=35
+        linha_divisoria = ctk.CTkFrame(
+            self,
+            height=3,
+            fg_color=("gray50", "gray90")
         )
-        self.input_mapa_origem.pack(pady=5)
+        linha_divisoria.pack(fill="x", pady=(5, 5))
 
-        self.input_mapa_destino = ctk.CTkEntry(
-            self, placeholder_text="Endereço de destino", width=300, height=35
-        )
-        self.input_mapa_destino.pack(pady=5)
+        frame = ctk.CTkFrame(self, fg_color="#051121")
+        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=0.75, anchor="center")
 
-        self.mapa = tkintermapview.TkinterMapView(self, width=540, height=320, corner_radius=8)
+        entrega_atual = self.entregas_otimizadas[0]
+        self.mapa_origem = entrega_atual.origem
+        self.mapa_destino = entrega_atual.destino
+
+        self.mapa = tkintermapview.TkinterMapView(frame, width=600, height=500, corner_radius=8)
         self.mapa.set_position(-22.25, -45.70)
         self.mapa.set_zoom(6)
         self.mapa.pack(pady=10)
 
+        self.ver_rota_no_mapa()
+
+        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
+        frame_botoes.pack(pady=(35, 0))
+
+        btn_salvar = ctk.CTkButton(
+            frame_botoes,
+            text="Finalizar Entrega",
+            command=finalizar_entrega,
+            fg_color="green", hover_color="darkgreen",
+            font=ctk.CTkFont(weight="bold"),
+            height=40, corner_radius=8, width=150
+        )
+        btn_salvar.pack(side="left", padx=10)
+
         btn_voltar = ctk.CTkButton(
-            self,
+            frame_botoes,
             text="Voltar",
             command=self.mostrar_tela_inicial,
             fg_color="transparent",
@@ -910,7 +962,10 @@ class App(ctk.CTk):
             text_color=("gray10", "gray90"),
             height=40, width=60, corner_radius=8
         )
-        btn_voltar.pack(pady=5)
+        btn_voltar.pack(side="right", pady=5)
+
+    def finalizar_entrega(self):
+        return
 
 
 if __name__ == "__main__":
