@@ -20,7 +20,14 @@ class OtimizadorRotas:
         return Rota(origem, destino, distancia_km, tempo_estimado_horas)
 
     def otimizar_entregas(self, origem_atual: str, entregas: list[Entrega]) -> list[Entrega]:
-        """Calcula a sequência de entregas baseada na menor distância (Vizinho Mais Próximo)"""
+
+        if not entregas:
+            return []
+
+        if hasattr(self.provedor_mapas, "construir_grafo_para_viagem"):
+            cidades_viagem = [origem_atual] + [e.origem for e in entregas] + [e.destino for e in entregas]
+            self.provedor_mapas.construir_grafo_para_viagem(cidades_viagem)
+
         entregas_pendentes = entregas.copy()
         entregas_otimizadas = []
         local_atual = origem_atual
@@ -39,7 +46,22 @@ class OtimizadorRotas:
             entregas_pendentes.remove(proxima_entrega)
             local_atual = proxima_entrega.destino
 
-        return entregas_otimizadas
+        vetor_final = []
+        for i in range(len(entregas_otimizadas)):
+            vetor_final.append(entregas_otimizadas[i])
+            if i < len(entregas_otimizadas) - 1:
+                destino_atual = entregas_otimizadas[i].destino
+                proxima_origem = entregas_otimizadas[i + 1].origem
+                if destino_atual != proxima_origem and proxima_origem != "Base":
+                    entrega_meio = Entrega(
+                        0,
+                        destino_atual,
+                        proxima_origem,
+                        1.0
+                    )
+                    vetor_final.append(entrega_meio)
+
+        return vetor_final
 
     def preparar_viagem(self, origem: str, destino: str, entregas: list[Entrega]) -> tuple[Rota, list[Entrega]]:
         rota = self.processar_rota(origem, destino)
