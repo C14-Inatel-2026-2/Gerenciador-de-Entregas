@@ -138,19 +138,20 @@ Estes são os comportamentos e funcionalidades diretas que o usuário interage:
 - **Tratamento de erros**: o sistema usa exceções próprias de domínio, deixando claro quando uma regra de negócio foi violada em vez de deixar o erro passar.
 - **Disponibilidade**: a aplicação é publicada no Render e fica acessível por uma URL pública.
 
-### 5) Refatorações Implementadas 
+## 5) Refatorações Implementadas 
 
 (Diego Victor)
+### Refactoring 1 — Replace Sorting with Algorithm: Algoritmo do Vizinho Mais Próximo**
+- **Code Smell:** Lógica de roteamento baseada em ordenação estática por categorias arbitrárias de prioridade (`ALTA`/`BAIXA`), o que limitava a precisão logística do sistema.
+- **Refactoring aplicado:** Substituição da ordenação estática pela implementação do algoritmo de **Vizinho Mais Próximo** (*Nearest Neighbor*) integrado a grafos (`otimizador_rotas.py`).
+- **Justificativa:** Alinhar o sistema às novas regras de negócio, passando a calcular dinamicamente o caminho mais curto por quilometragem (distância real) em vez de prioridades genéricas, otimizando a viagem inteira do caminhão entre múltiplos nós consecutivos.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/28
 
-Foram realizadas duas refatorações  no código de produção para alinhar o sistema às novas regras de negócio e garantir um código mais limpo:
-
-1. **Refatoração da Lógica de Roteamento (`otimizador_rotas.py`):**
-   - **O que foi feito:** Substituição da ordenação estática por prioridade (que usava ALTA/BAIXA) pela implementação do algoritmo logístico de "Vizinho Mais Próximo" (Nearest Neighbor) consumindo dados de um grafo.
-   - **Por que foi feito:** Mudança estrutural na regra de negócio. Percebeu-se a necessidade de traçar as rotas utilizando quilometragem (distância real) em vez de categorias arbitrárias de prioridade. Isso permite que o sistema calcule dinamicamente o caminho mais curto, conectando múltiplos nós consecutivos e otimizando a viagem inteira do caminhão.
-
-2. **Simplificação da Validação de Parâmetros (método `processar_rota`):**
-   - **O que foi feito:** Remoção da checagem dupla/redundante de valores nulos (`if not origem or not origem.strip()`), mantendo apenas a validação de strings vazias com `if not origem.strip()`.
-   - **Por que foi feito:** Alinhamento técnico com a equipe. Concluiu-se formalmente que o sistema não vai permitir o cadastro sem colocar todas as informações Como essa trava já garante que nunca chegará uma string nula na requisição, a dupla checagem tornou-se uma "programação defensiva" redundante, e a sua remoção deixou o código mais limpo e direto.
+### Refactoring 2 — Remove Dead Code / Redundant Check: Simplificação da Validação de Parâmetros**
+- **Code Smell:** Dupla checagem redundante de valores nulos e vazios (`if not origem or not origem.strip()`) no método `processar_rota`.
+- **Refactoring aplicado:** Remoção da checagem dupla, mantendo apenas a validação estrita com `if not origem.strip()`.
+- **Justificativa:** Eliminar código redundante de "programação defensiva", uma vez que o fluxo de cadastro prévio já bloqueia entradas nulas no sistema, deixando o código de produção mais limpo, direto e alinhado com o restante da equipe.
+- **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/28
 
 (Gabriel)
 
@@ -165,3 +166,15 @@ Foram realizadas duas refatorações  no código de produção para alinhar o si
 - **Refactoring aplicado:** Extração da validação para o método `_validar_veiculo()`.
 - **Justificativa:** Separar as responsabilidades, melhorar a organização do código e facilitar a manutenção e os testes.
 - **Pull Request:** https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/27
+
+- (Leonardo Vieira)
+
+Fiz duas refatorações na minha parte (cálculo do custo), mantendo os testes e o pipeline passando.
+
+**1. Tirei o cálculo do custo total de dentro da tela e levei pro serviço.**
+Antes a soma do custo total (combustível + custo por distância) estava sendo feita no `frontend.py`, ou seja, regra de negócio no meio da interface. Criei o método `calcular_custo_total` dentro do `CalculadorCusto` e deixei a tela só chamando ele. Assim a regra fica onde deve ficar e deu pra testar isso isolado (criei o `test_calcular_custo_total_usando_mock`).
+
+**2. Troquei números soltos por constantes com nome.**
+A tela de custo tinha uns números jogados no código sem explicação nenhuma (os "magic numbers"). Coloquei eles como constantes no topo do `frontend.py` (`TEMPO_ROTA_PADRAO_HORAS`, `CAPACIDADE_PADRAO_KG`, `UF_PADRAO`) e usei elas no lugar. Ficou bem mais claro o que cada valor significa.
+
+PR das duas: https://github.com/C14-Inatel-2026-2/Gerenciador-de-Entregas/pull/24
