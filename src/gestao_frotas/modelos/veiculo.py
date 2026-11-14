@@ -40,3 +40,7 @@ class Veiculo:
     @property
     def custo_por_km(self):
         return self.__custo_por_km
+
+    @property
+    def tipo(self):
+        return self.__tipo
