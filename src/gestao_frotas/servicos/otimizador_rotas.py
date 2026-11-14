@@ -21,6 +21,13 @@ class OtimizadorRotas:
 
     def otimizar_entregas(self, origem_atual: str, entregas: list[Entrega]) -> list[Entrega]:
         """Calcula a sequência de entregas baseada na menor distância (Vizinho Mais Próximo)"""
+        if not entregas:
+            return []
+
+        if hasattr(self.provedor_mapas, "construir_grafo_para_viagem"):
+            cidades_viagem = [origem_atual] + [e.origem for e in entregas] + [e.destino for e in entregas]
+            self.provedor_mapas.construir_grafo_para_viagem(cidades_viagem)
+
         entregas_pendentes = entregas.copy()
         entregas_otimizadas = []
         local_atual = origem_atual
