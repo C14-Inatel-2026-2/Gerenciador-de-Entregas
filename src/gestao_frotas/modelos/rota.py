@@ -3,16 +3,14 @@ from gestao_frotas.excecoes import DadoInvalidoException
 
 class Rota:
 
-    # Atributos
     __id: int
     __origem: str
     __destino: str
     __distancia_km: float
     __tempo_estimado_horas: float
 
-   #Construtor
-
-    def __init__(self, origem: str, destino: str, distancia_km: float, tempo_estimado_horas: float ):
+    def __init__(self, origem: str, destino: str, distancia_km: float , tempo_estimado_horas: float = None):
+        tempo_estimado_horas = self.estimar_hora(distancia_km)
         if distancia_km <= 0:
             raise DadoInvalidoException("A distância deve ser maior que zero.")
 
@@ -24,11 +22,11 @@ class Rota:
         self.__distancia_km = distancia_km
         self.__tempo_estimado_horas = tempo_estimado_horas
 
+    def estimar_hora(self, distancia_km):
+        return (distancia_km/80)
 
-    # Métodos
     def __repr__(self) -> str:
         return (
-            f"Rota(id={self.__id}, "
             f"origem='{self.__origem}', "
             f"destino='{self.__destino}', "
             f"distancia={self.__distancia_km}km, "

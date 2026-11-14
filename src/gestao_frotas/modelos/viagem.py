@@ -15,7 +15,6 @@ class Viagem:
     # Atributos
     __motorista: Motorista
     __veiculo: Veiculo
-    __rota: Rota
     __entregas: list
     __horario_inicio: datetime.datetime
     __horario_termino: datetime.datetime
@@ -53,7 +52,6 @@ class Viagem:
         return (
             f"Viagem(motorista={self.motorista}, "
             f"veiculo={self.veiculo}, "
-            f"rota={self.rota}, "
             f"entregas={len(self.entregas)}, "
             f"status='{self.__status}')"
         )
@@ -65,10 +63,6 @@ class Viagem:
     @property
     def veiculo(self) -> Veiculo:
         return self.__veiculo
-
-    @property
-    def rota(self) -> Rota:
-        return self.__rota
 
     @property
     def entregas(self) -> list[Entrega]:
