@@ -339,9 +339,6 @@ class App(ctk.CTk):
 
         nova_entrega = Entrega(int(id), origem, destino, int(peso), prioridade)
         self.historico_entregas.append(nova_entrega)
-
-        messagebox.showinfo("Sucesso", "Entrega Cadastrada com sucesso!")
-        print(nova_entrega)
         self.mostrar_tela_inicial()
 
     def mostrar_tela_cadastro_motorista(self):
@@ -387,7 +384,6 @@ class App(ctk.CTk):
             return
         motorista = Motorista(len(self.motoristas) + 1, nome, cnh)
         self.motoristas.append(motorista)
-        messagebox.showinfo("Sucesso", "Motorista cadastrado!")
         self.mostrar_tela_inicial()
 
     def mostrar_tela_motoristas(self):
@@ -620,7 +616,6 @@ class App(ctk.CTk):
             self.mapa.set_path(pontos)
             self.mapa.set_position(coord_origem[0], coord_origem[1])
             self.mapa.set_zoom(9)
-            messagebox.showinfo("Rota", f"Distância pela estrada: {distancia:.1f} km")
         else:
             self.mapa.set_path([coord_origem, coord_destino])
             self.mapa.set_position(coord_origem[0], coord_origem[1])
@@ -1008,6 +1003,8 @@ class App(ctk.CTk):
 
     def finalizar_entrega(self, viagem: Viagem, motorista: Motorista):
         viagem.pop()
+        if not viagem.entregas:
+            gerenciador_viagens.finalizar_viagem(viagem)
         del self.entrega_atual
         self.ver_rota(motorista, viagem)
 
