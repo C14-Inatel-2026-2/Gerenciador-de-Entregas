@@ -82,3 +82,6 @@ class Viagem:
     def horario_termino(self):
         return self.__horario_termino
 
+    def pop(self):
+        self.__entregas.pop()
+

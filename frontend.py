@@ -904,12 +904,15 @@ class App(ctk.CTk):
     def ver_rota(self, motorista: Motorista, viagem: Viagem):
         self.limpar_janela()
 
-        if not viagem:
+        if not viagem.entregas:
             messagebox.showerror("Aviso", "Você não possui nenhuma entrega a pendente no momento")
             self.mostrar_tela_entregas(motorista)
             return
 
         self.entregas_otimizadas = otimizador.otimizar_entregas("Santa Rita do Sapucaí", viagem.entregas)
+        self.entrega_atual = self.entregas_otimizadas[0]
+        self.mapa_origem = self.entrega_atual.origem
+        self.mapa_destino = self.entrega_atual.destino
 
         titulo = ctk.CTkLabel(self, text="Mapa da Rota", font=("Arial", 24, "bold"))
         titulo.pack(pady=10)
@@ -921,46 +924,92 @@ class App(ctk.CTk):
         )
         linha_divisoria.pack(fill="x", pady=(5, 5))
 
-        frame = ctk.CTkFrame(self, fg_color="#051121")
-        frame.place(relx=0.5, rely=0.5, relwidth=1, relheight=0.75, anchor="center")
-
-        entrega_atual = self.entregas_otimizadas[0]
-        self.mapa_origem = entrega_atual.origem
-        self.mapa_destino = entrega_atual.destino
-
-        self.mapa = tkintermapview.TkinterMapView(frame, width=600, height=500, corner_radius=8)
+        self.mapa = tkintermapview.TkinterMapView(self, width=600, height=450, corner_radius=8)
         self.mapa.set_position(-22.25, -45.70)
         self.mapa.set_zoom(6)
         self.mapa.pack(pady=10)
 
         self.ver_rota_no_mapa()
 
-        frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
-        frame_botoes.pack(pady=(35, 0))
-
         btn_salvar = ctk.CTkButton(
-            frame_botoes,
+            self,
             text="Finalizar Entrega",
-            command=self.finalizar_entrega,
+            command=lambda: self.confirmar_acao(viagem, motorista),
             fg_color="green", hover_color="darkgreen",
             font=ctk.CTkFont(weight="bold"),
             height=40, corner_radius=8, width=150
         )
-        btn_salvar.pack(side="left", padx=10)
+        btn_salvar.pack(pady=15)
 
         btn_voltar = ctk.CTkButton(
-            frame_botoes,
+            self,
             text="Voltar",
-            command=self.mostrar_tela_inicial,
+            command=lambda: self.mostrar_tela_entregas(motorista),
             fg_color="transparent",
             border_width=1,
             text_color=("gray10", "gray90"),
             height=40, width=60, corner_radius=8
         )
-        btn_voltar.pack(side="right", pady=5)
+        btn_voltar.pack(pady=8)
 
-    def finalizar_entrega(self):
-        return
+    def confirmar_acao(self, viagem: Viagem, motorista: Motorista,
+                       mensagem ="Tem certeza que deseja realizar esta ação?", ao_confirmar=None):
+        # Cria uma janela secundária (toplevel)
+        janela_confirmacao = ctk.CTkToplevel(self)
+        janela_confirmacao.geometry("380x200")
+        janela_confirmacao.title("Confirmação de Segurança")
+
+        janela_confirmacao.grab_set()
+
+        janela_confirmacao.resizable(False, False)
+
+        lbl_icone = ctk.CTkLabel(janela_confirmacao, text="⚠️", font=("Arial", 32))
+        lbl_icone.pack(pady=(15, 5))
+
+        lbl_mensagem = ctk.CTkLabel(
+            janela_confirmacao,
+            text=mensagem,
+            font=("Arial", 14, "bold"),
+            wraplength=340,
+            justify="center"
+        )
+        lbl_mensagem.pack(pady=5)
+
+        frame_botoes = ctk.CTkFrame(janela_confirmacao, fg_color="transparent")
+        frame_botoes.pack(pady=15)
+
+        btn_cancelar = ctk.CTkButton(
+            frame_botoes,
+            text="Cancelar",
+            fg_color="gray",
+            hover_color="darkgray",
+            text_color="white",
+            width=120,
+            height=35,
+            command=janela_confirmacao.destroy
+        )
+        btn_cancelar.pack(side="left", padx=10)
+
+        def executar_e_fechar():
+            janela_confirmacao.destroy()
+            self.finalizar_entrega(viagem, motorista)
+
+        btn_confirmar = ctk.CTkButton(
+            frame_botoes,
+            text="Confirmar",
+            fg_color="#d97706",
+            hover_color="#b45309",
+            text_color="white",
+            width=120,
+            height=35,
+            command=executar_e_fechar
+        )
+        btn_confirmar.pack(side="left", padx=10)
+
+    def finalizar_entrega(self, viagem: Viagem, motorista: Motorista):
+        viagem.pop()
+        del self.entrega_atual
+        self.ver_rota(motorista, viagem)
 
 
 if __name__ == "__main__":
