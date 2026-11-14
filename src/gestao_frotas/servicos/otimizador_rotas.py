@@ -46,7 +46,22 @@ class OtimizadorRotas:
             entregas_pendentes.remove(proxima_entrega)
             local_atual = proxima_entrega.destino
 
-        return entregas_otimizadas
+        vetor_final = []
+        for i in range(len(entregas_otimizadas)):
+            vetor_final.append(entregas_otimizadas[i])
+            if i < len(entregas_otimizadas) - 1:
+                destino_atual = entregas_otimizadas[i].destino
+                proxima_origem = entregas_otimizadas[i + 1].origem
+                if destino_atual != proxima_origem and proxima_origem != "Base":
+                    entrega_meio = Entrega(
+                        0,
+                        destino_atual,
+                        proxima_origem,
+                        1.0
+                    )
+                    vetor_final.append(entrega_meio)
+
+        return vetor_final
 
     def preparar_viagem(self, origem: str, destino: str, entregas: list[Entrega]) -> tuple[Rota, list[Entrega]]:
         rota = self.processar_rota(origem, destino)
