@@ -82,3 +82,21 @@ def test_preparar_viagem_retorna_dados_corretos(otimizador):
     assert rota.origem == "Santa Rita"
     assert len(sequencia) == 1
     assert sequencia[0].destino == "Itajubá"
+
+def test_otimizar_entregas_insere_deslocamento_quando_ha_salto(otimizador):
+    entrega1 = Entrega(1, "Santa Rita", "Pouso Alegre", 10.0)
+    entrega2 = Entrega(2, "Itajubá", "Maria da Fé", 15.0)
+
+    sequencia = otimizador.otimizar_entregas("Santa Rita", [entrega1, entrega2])
+
+
+    assert len(sequencia) == 3
+    assert sequencia[0].origem == "Santa Rita"
+    assert sequencia[0].destino == "Pouso Alegre"
+
+    assert sequencia[1].id == 0
+    assert sequencia[1].origem == "Pouso Alegre"
+    assert sequencia[1].destino == "Itajubá"
+
+    assert sequencia[2].origem == "Itajubá"
+    assert sequencia[2].destino == "Maria da Fé"
