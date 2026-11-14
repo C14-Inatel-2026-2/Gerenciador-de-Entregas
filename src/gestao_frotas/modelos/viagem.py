@@ -1,58 +1,59 @@
-from gestao_frotas.excecoes import DadoInvalidoException, StatusInvalidoException
+import datetime
+from enum import Enum
 from gestao_frotas.modelos.entrega import Entrega
 from gestao_frotas.modelos.motorista import Motorista
 from gestao_frotas.modelos.rota import Rota
 from gestao_frotas.modelos.veiculo import Veiculo
 
 
+class StatusViagem(Enum):
+    PENDENTE = 1
+    EM_ANDAMENTO = 2
+    CONCLUIDO = 3
+
 class Viagem:
-
     # Atributos
-
-    motorista: Motorista
-    veiculo: Veiculo
-    rota: Rota
-    entregas: list
-    horario_inicio: str
-    horario_termino: str
-    status: str  #(Pendente, A Caminho, Entregue?
+    __motorista: Motorista
+    __veiculo: Veiculo
+    __entregas: list
+    __horario_inicio: datetime.datetime
+    __horario_termino: datetime.datetime
+    __status: StatusViagem
+    __custo_total: float
 
     # Construtor
 
     def __init__(
-        self,motorista: Motorista, veiculo: Veiculo, rota: Rota, entregas: list[Entrega] ,horario_inicio: str = None, horario_termino: str = None, status: str = "Pendente"):
+        self, motorista: Motorista, veiculo: Veiculo, entregas: list[Entrega],
+            horario_inicio: datetime.datetime = None, horario_termino: datetime.datetime = None,
+            status: StatusViagem = StatusViagem.PENDENTE):
 
-        status_validos = ["Pendente", "Em Andamento", "Concluida"]
-        if status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inicial inválido: {status}. Use: {status_validos}"
-            )
-
-        self.motorista = motorista
-        self.veiculo = veiculo
-        self.rota = rota
-        self.entregas = entregas if entregas is not None else []
-        self.horario_inicio = horario_inicio
-        self.horario_termino = horario_termino
-        self.status = status
+        self.__motorista = motorista
+        self.__veiculo = veiculo
+        self.__entregas = entregas if entregas is not None else []
+        self.__horario_inicio = horario_inicio
+        self.__horario_termino = horario_termino
+        self.__status = status
 
     # Métodos
 
-    def atualizar_status(self, novo_status: str) -> None:
-        status_validos = ["Pendente", "Em Andamento", "Concluida"]
-        if novo_status not in status_validos:
-            raise StatusInvalidoException(
-                f"Status inválido: {novo_status}. Permitidos: {status_validos}"
-            )
-        self.status = novo_status
+    def atualizar_status(self, status: StatusViagem):
+        if not isinstance(status, StatusViagem):
+            raise ValueError("Status inválido. Deve ser um valor do Enum StatusViagem.")
+        self.__status = status
+
+    def get_status(self):
+        return self.__status
+
+    def addCustoTotal(self, custo_total: float):
+        self.__custo_total = custo_total
 
     def __repr__(self) -> str:
         return (
             f"Viagem(motorista={self.motorista}, "
             f"veiculo={self.veiculo}, "
-            f"rota={self.rota}, "
             f"entregas={len(self.entregas)}, "
-            f"status='{self.status}')"
+            f"status='{self.__status}')"
         )
 
     @property
@@ -62,10 +63,6 @@ class Viagem:
     @property
     def veiculo(self) -> Veiculo:
         return self.__veiculo
-
-    @property
-    def rota(self) -> Rota:
-        return self.__rota
 
     @property
     def entregas(self) -> list[Entrega]:
@@ -79,6 +76,7 @@ class Viagem:
     def horario_termino(self):
         return self.__horario_termino
 
-    @property
-    def status(self) -> str:
-        return self.__status
+    def pop(self):
+        if self.__entregas:
+            self.__entregas.pop(0)
+
