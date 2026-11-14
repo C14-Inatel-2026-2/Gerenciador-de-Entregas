@@ -20,7 +20,7 @@ class OtimizadorRotas:
         return Rota(origem, destino, distancia_km, tempo_estimado_horas)
 
     def otimizar_entregas(self, origem_atual: str, entregas: list[Entrega]) -> list[Entrega]:
-        """Calcula a sequência de entregas baseada na menor distância (Vizinho Mais Próximo)"""
+
         if not entregas:
             return []
 
